@@ -25,8 +25,11 @@
 }
 /* HEADER */
 .site-header {
+/* HEADER FIXED CORRECTO */
+.site-header {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
   z-index: 1000;
 
@@ -34,40 +37,37 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
-  padding: 0 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-/* CONTENEDOR FLEX */
 .header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   height: 70px;
   padding: 0 20px;
 }
 
-/* LOGO */
 .logo {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #e6f1ff;
-    margin-right: auto;
-
-  text-shadow:
-    0 0 6px rgba(59,130,246,0.4),
-    0 0 12px rgba(59,130,246,0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* BOTÓN */
 .signin-btn {
   color: #cbd5e1;
   text-decoration: none;
   font-weight: 500;
   padding: 8px 16px;
   border-radius: 8px;
-  transition: all 0.3s ease;
-   white-space: nowrap;
-
+  transition: 0.3s ease;
 }
 
 .signin-btn:hover {
@@ -206,6 +206,7 @@ font-family: 'Segoe UI', Arial, sans-serif;
 background: radial-gradient(circle at top left, #0f3b52 0%, #031018 40%, #000 100%);
 color:white;
 overflow-x:hidden;
+  padding-top: 70px;
 }
 
 header{
@@ -337,6 +338,7 @@ animation:pulse 1.5s infinite;
     
   </div>
 <a href="#" class="signin-btn">Sign In</a>
+  </div>
   <div class="divider"></div>
 </header>
 
@@ -483,7 +485,7 @@ animateValue(document.getElementById("liquidity"), liquidity, true);
 animateValue(document.getElementById("volume"), volume, true);
 animateValue(document.getElementById("marketcap"), marketcap, true);
 animateValue(document.getElementById("holders"), parseInt(data.result), false);
-
+}
 
 }catch(error){
 console.log(error);
