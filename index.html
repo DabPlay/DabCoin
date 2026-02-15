@@ -169,6 +169,17 @@
   }
 }
 
+.mobile-mode .stat-card{
+background: transparent !important;
+border: none !important;
+backdrop-filter: none !important;
+padding: 8px !important;
+}
+
+.mobile-mode{
+flex-wrap: nowrap !important;
+justify-content: space-between !important;
+}
 
 
 
@@ -300,6 +311,18 @@ flex-direction:column;
 }
 
 }
+#live-status{
+font-size:12px;
+color:#00ff88;
+margin-top:5px;
+animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+0%{opacity:0.4}
+50%{opacity:1}
+100%{opacity:0.4}
+}
 
 </style>
 </head>
@@ -338,6 +361,7 @@ flex-direction:column;
 
 <div class="price-box" id="price">$0.00000000</div>
 <div class="stats">
+<div id="live-status">● LIVE</div>
 
 <div class="stat-card">
 <h3>Market Cap</h3>
@@ -405,23 +429,30 @@ const apiKey = "YOUR_BSCSCAN_API_KEY";
 // Animated Counter
 //////////////////////////////////////////////////
 
-function animateValue(id, start, end, duration) {
+function animateValue(element, newValue, isCurrency = true) {
 
-let range = end - start;
-let current = start;
-let increment = end > start ? 1 : -1;
-let stepTime = Math.abs(Math.floor(duration / range));
-let obj = document.getElementById(id);
+let start = parseFloat(element.innerText.replace(/[^0-9.-]+/g,"")) || 0;
+let end = newValue;
+let duration = 800;
+let startTime = null;
 
-let timer = setInterval(function() {
-current += increment;
-obj.innerText = "$" + current.toLocaleString();
-if (current == end) {
-clearInterval(timer);
+function animation(currentTime){
+if(!startTime) startTime = currentTime;
+let progress = Math.min((currentTime - startTime) / duration, 1);
+let value = start + (end - start) * progress;
+
+element.innerText = isCurrency
+? "$" + value.toLocaleString(undefined,{maximumFractionDigits:2})
+: Math.floor(value).toLocaleString();
+
+if(progress < 1){
+requestAnimationFrame(animation);
 }
-}, stepTime);
-
 }
+
+requestAnimationFrame(animation);
+}
+
 
 //////////////////////////////////////////////////
 // Fetch DexScreener Data
@@ -446,19 +477,12 @@ const liquidity = parseFloat(pair.liquidity.usd);
 const volume = parseFloat(pair.volume.h24);
 const marketcap = parseFloat(pair.fdv);
 
-document.getElementById("price").innerText =
-"$"+price.toFixed(10);
+animateValue(document.getElementById("price"), price, true);
+animateValue(document.getElementById("liquidity"), liquidity, true);
+animateValue(document.getElementById("volume"), volume, true);
+animateValue(document.getElementById("marketcap"), marketcap, true);
+animateValue(document.getElementById("holders"), parseInt(data.result), false);
 
-document.getElementById("liquidity").innerText =
-"$"+liquidity.toLocaleString();
-
-document.getElementById("volume").innerText =
-"$"+volume.toLocaleString();
-
-document.getElementById("marketcap").innerText =
-"$"+marketcap.toLocaleString();
-
-}
 
 }catch(error){
 console.log(error);
@@ -497,7 +521,7 @@ console.log(e);
 
 function reveal(){
 
-let reveals = document.querySelectorAll(".stat-box");
+let reveals = document.querySelectorAll(".stat-card");
 
 for(let i = 0; i < reveals.length; i++){
 
@@ -517,11 +541,36 @@ window.addEventListener("scroll", reveal);
 
 //////////////////////////////////////////////////
 
-setInterval(fetchTokenData, 5000);
+let refreshRate = window.innerWidth <= 768 ? 8000 : 5000;
+setInterval(fetchTokenData, refreshRate);
 setInterval(fetchHolders, 10000);
 
 fetchTokenData();
 fetchHolders();
+function handleScreenSize(){
+
+const width = window.innerWidth;
+const stats = document.querySelector(".stats");
+
+if(width <= 768){
+stats.classList.add("mobile-mode");
+}else{
+stats.classList.remove("mobile-mode");
+}
+
+}
+
+window.addEventListener("resize", handleScreenSize);
+handleScreenSize();
+let lastPrice = 0;
+
+if(price > lastPrice){
+document.getElementById("price").style.color = "#00ff88";
+}else if(price < lastPrice){
+document.getElementById("price").style.color = "#ff4d4d";
+}
+
+lastPrice = price;
 
 </script>
 
