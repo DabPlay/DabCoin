@@ -107,7 +107,7 @@
   margin-top: 40px;
 }
 
-/* ======== PC (ESTILO TARJETA) ======== */
+/* ===== PC ===== */
 .stat-card {
   flex: 1 1 250px;
   max-width: 300px;
@@ -132,38 +132,43 @@
 
 .stat-card p {
   font-size: 14px;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
-/* ======== MÓVIL ======== */
+/* ===== MÓVIL DASHBOARD STYLE ===== */
 @media (max-width: 768px) {
 
   .stats {
-    flex-wrap: nowrap;          /* todos en una fila */
+    flex-wrap: nowrap;
     justify-content: space-between;
+    align-items: center;
+    gap: 10px;
   }
 
   .stat-card {
     flex: 1;
-    max-width: none;
-    padding: 10px;
+    padding: 8px 5px;
 
-    background: transparent;    /* quitamos efecto card */
-    backdrop-filter: none;
+    background: transparent;
     border: none;
-    border-radius: 0;
-
+    backdrop-filter: none;
     box-shadow: none;
   }
 
   .stat-card h3 {
-    font-size: 18px;            /* texto más pequeño */
+    font-size: 18px;
+    margin-bottom: 2px;
+    color: #ffffff;
   }
 
   .stat-card p {
-    font-size: 11px;
+    font-size: 10px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 }
+
 
 
 
