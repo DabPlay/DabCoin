@@ -104,19 +104,51 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
+  gap: 25px;
+  margin-top: 40px;
 }
 
+/* TARJETA */
 .stat-card {
-  flex: 1 1 250px;       /* mínimo 250px */
+  flex: 1 1 250px;
   max-width: 300px;
-  padding: 25px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.05);
+  padding: 30px;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
   text-align: center;
-  backdrop-filter: blur(8px);
+  color: #e6f1ff;
+
+  transition: all 0.35s ease;
+  cursor: pointer;
 }
+
+/* NUMERO GRANDE */
+.stat-card h3 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #3b82f6;
+}
+
+/* TEXTO */
+.stat-card p {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* HOVER */
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
 
 
 
