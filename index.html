@@ -455,6 +455,11 @@ animation:pulse 1.5s infinite;
 <h3>Holders</h3>
 <p id="holders">0</p>
 </div>
+
+  <div class="stat-card">
+<h3>Tax</h3>
+<p id="tax">5%</p>
+  </div>
     
 <div class="stat-card">
 <h3>Pair Age</h3>
@@ -714,6 +719,7 @@ updatePairAge();
   // Simular carga de 0.7s
 document.addEventListener("DOMContentLoaded", () => {
   const pairAge = document.getElementById("pair-age");
+const liquidity = document.getElementById("liquidity");
 
   // Guardamos el valor real
   const realValue = pairAge.textContent;
