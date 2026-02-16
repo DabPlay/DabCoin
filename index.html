@@ -427,9 +427,6 @@ animation:pulse 1.5s infinite;
 </header>
 
 
-
-
-
 <section class="hero">
 
 <h1>DabCoin (DAB)</h1>
@@ -476,14 +473,17 @@ animation:pulse 1.5s infinite;
 <h3>Holders</h3>
 <p id="holders">0</p>
 </div>
-
-</div>
+    
+<div class="stat-card">
+<h3>Pair Age</h3>
 <p id="pair-age">0 days</p>
+</div>
+
 
 </section>
 <section class="section">
 
-<h2>Live Chart</h2>
+<h2>Gráfica</h2>
 
 <iframe 
 src="https://dexscreener.com/bsc/0x4E11b900c94b2ab9155330B2052827Ab74d183c5?embed=1&theme=dark"
@@ -496,7 +496,7 @@ style="border:none;border-radius:12px;">
 
 <section class="section">
 
-<h2>For Tokens</h2>
+<h2>Tokens</h2>
 
 <div class="market-section">
 
@@ -505,7 +505,7 @@ style="border:none;border-radius:12px;">
 <h3>Enhanced Token Info</h3>
 
 <p>
-Quickly update your DabCoin page with accurate and up-to-date info and socials.
+Coming Soon...
 </p>
 
 <a class="button" href="#">Learn more</a>
@@ -696,55 +696,6 @@ async function refreshAll() {
 refreshAll();
 setInterval(refreshAll, 10000);
 
-async function loadPairAge() {
-  try {
-
-    const pair = new ethers.Contract(
-      TOKEN_WBNB_PAIR,
-      [
-        "event Mint(address indexed sender, uint amount0, uint amount1)"
-      ],
-      provider
-    );
-
-    const currentBlock = await provider.getBlockNumber();
-
-    // 🔥 Ajuste inteligente:
-    // Busca solo en los últimos 1,500,000 bloques (~15-20 días aprox en BSC)
-    const startBlock = currentBlock - 1500000;
-
-    const events = await pair.queryFilter(
-      pair.filters.Mint(),
-      startBlock,
-      currentBlock
-    );
-
-    if (!events || events.length === 0) {
-      document.getElementById("pair-age").innerText = "N/A";
-      return;
-    }
-
-    const firstMintBlock = events[0].blockNumber;
-    const block = await provider.getBlock(firstMintBlock);
-
-    const creationTime = block.timestamp;
-    const now = Math.floor(Date.now() / 1000);
-    const diffSeconds = now - creationTime;
-
-    const days = Math.floor(diffSeconds / 86400);
-
-    document.getElementById("pair-age").innerText =
-      days + " days";
-
-  } catch (err) {
-    console.log("Pair age error:", err);
-    document.getElementById("pair-age").innerText = "N/A";
-  }
-}
-
-
-
-
 </script>
 
 
@@ -765,12 +716,8 @@ function updatePairAge() {
     let display = "";
 
     if (days > 0) {
-        display = `${days}d ${hours}h`;
-    } else if (hours > 0) {
-        display = `${hours}h ${minutes}m`;
-    } else {
-        display = `${minutes}m`;
-    }
+        display = `${days}Days`;
+    } 
 
     document.getElementById("pair-age").innerText = display;
 }
