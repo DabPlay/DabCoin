@@ -10,7 +10,41 @@
 
 <style>
 
+.chart-section{
+position:relative;
+padding:100px 20px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
 
+.chart-overlay{
+width:100%;
+max-width:1100px;
+border-radius:20px;
+overflow:hidden;
+
+/* efecto glass */
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
+box-shadow:0 0 60px rgba(0,198,255,0.2);
+
+transition:0.4s;
+}
+
+.chart-overlay:hover{
+transform:translateY(-5px);
+box-shadow:0 0 80px rgba(0,198,255,0.4);
+}
+
+.chart-frame{
+width:100%;
+height:600px;
+border:none;
+opacity:0.9; /* aquí controlas la transparencia */
+}
+
+    
 .btn{
 display:inline-flex;
 align-items:center;
@@ -410,6 +444,18 @@ animation:pulse 1.5s infinite;
   <div class="divider"></div>
 </header>
 
+<section class="chart-section">
+
+<div class="chart-overlay">
+
+<iframe
+src="https://dexscreener.com/bsc/0x4E11b900c94b2ab9155330B2052827Ab74d183c5?embed=1&theme=dark"
+class="chart-frame">
+</iframe>
+
+</div>
+
+</section>
 
 
 <section class="hero">
