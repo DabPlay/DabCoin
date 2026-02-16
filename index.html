@@ -45,14 +45,13 @@
 .stat-card {
   background: linear-gradient(145deg, #1b2a3a, #162233);
   border-radius: 18px;
-  
+  padding: 10px 10px;
   text-align: center;
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.4),
     inset 0 0 0 1px rgba(255,255,255,0.03);
   transition: 0.3s ease;
-  height: 50%;
-  weight: 90hv;
+
 }
 
 /* TITULO */
@@ -717,38 +716,22 @@ updatePairAge();
 
 
 
+const ids = ["price-bnb","price-usdt","marketcap","liquidity","volume","holders","tax","pair-age"];
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Lista de IDs a animar
-  const elements = [
-    "price-bnb",
-    "price-usdt",
-    "marketcap",
-    "liquidity",
-    "volume",
-    "holders",
-    "tax",
-    "pair-age"
-  ];
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-  elements.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    // Guardar el valor real
-    const realValue = el.textContent;
-
-    // Poner loader
-    el.textContent = "";
-    el.classList.add("loading");
-
-    // Reemplazar con el valor real después de 0.7s
-    setTimeout(() => {
-      el.textContent = realValue;
+  const observer = new MutationObserver(() => {
+    // Cuando el contenido cambie, quitar loader
+    if (el.textContent && el.textContent !== "0" && el.textContent !== "Days") {
       el.classList.remove("loading");
-    }, 2000);
+    }
   });
+
+  observer.observe(el, { childList: true });
 });
+
 
   
 </script>
