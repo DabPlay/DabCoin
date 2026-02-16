@@ -463,7 +463,7 @@ animation:pulse 1.5s infinite;
     
 <div class="stat-card">
 <h3>Pair Age</h3>
-<p id="pair-age" class="loading">Days</p>
+<p id="pair-age" class="loading"> Days</p>
 </div>
 
 
@@ -716,24 +716,38 @@ updatePairAge();
 
 
 
-  // Simular carga de 0.7s
 document.addEventListener("DOMContentLoaded", () => {
-  const pairAge = document.getElementById("pair-age");
-const liquidity = document.getElementById("liquidity");
+  // Lista de IDs a animar
+  const elements = [
+    "price-bnb",
+    "price-usdt",
+    "marketcap",
+    "liquidity",
+    "volume",
+    "holders",
+    "tax",
+    "pair-age"
+  ];
 
-  // Guardamos el valor real
-  const realValue = pairAge.textContent;
+  elements.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
 
-  // Ponemos loader
-  pairAge.textContent = "";
-  pairAge.classList.add("loading");
+    // Guardar el valor real
+    const realValue = el.textContent;
 
-  // Después de 0.7s, mostramos el valor real
-  setTimeout(() => {
-    pairAge.textContent = realValue;
-    pairAge.classList.remove("loading");
-  }, 700); // 700 ms
+    // Poner loader
+    el.textContent = "";
+    el.classList.add("loading");
+
+    // Reemplazar con el valor real después de 0.7s
+    setTimeout(() => {
+      el.textContent = realValue;
+      el.classList.remove("loading");
+    }, 700);
+  });
 });
+
   
 </script>
 
