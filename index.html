@@ -749,6 +749,38 @@ async function loadPairAge() {
 
 
 
+<script>
+
+const pairCreatedAt = new Date("2026-02-12T02:38A.M.").getTime(); 
+
+function updatePairAge() {
+    const now = new Date().getTime();
+    const diff = now - pairCreatedAt;
+
+    const seconds = Math.floor(diff / 1000);
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    let display = "";
+
+    if (days > 0) {
+        display = `${days}d ${hours}h`;
+    } else if (hours > 0) {
+        display = `${hours}h ${minutes}m`;
+    } else {
+        display = `${minutes}m`;
+    }
+
+    document.getElementById("pair-age").innerText = display;
+}
+
+
+setInterval(updatePairAge, 1000);
+updatePairAge();
+</script>
+
+
 
 
 
