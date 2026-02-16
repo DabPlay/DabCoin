@@ -9,53 +9,70 @@
 <link rel="icon" type="image/png" href="logo.png">
 
 <style>
+    body{
+margin:0;
+background:linear-gradient(135deg,#0f172a,#020617);
+font-family:Arial, sans-serif;
+color:white;
+overflow-x:hidden;
+}
 
-.chart-section{
-padding:100px 20px;
+.hero{
+position:relative;
+height:100vh;
+width:100%;
 display:flex;
+align-items:center;
 justify-content:center;
-}
-
-.chart-clean{
-width:100%;
-max-width:1200px;
-border-radius:20px;
+text-align:center;
 overflow:hidden;
-
-background:rgba(255,255,255,0.03);
-backdrop-filter:blur(20px);
-
-box-shadow:0 0 80px rgba(0,198,255,0.2);
 }
 
-
-.chart-overlay{
+#chartCanvas{
+position:absolute;
+top:0;
+left:0;
 width:100%;
-max-width:1100px;
-border-radius:20px;
-overflow:hidden;
-
-/* efecto glass */
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(20px);
-box-shadow:0 0 60px rgba(0,198,255,0.2);
-
-transition:0.4s;
+height:100%;
+z-index:0;
+opacity:0.35;
 }
 
-.chart-overlay:hover{
-transform:translateY(-5px);
-box-shadow:0 0 80px rgba(0,198,255,0.4);
+.hero-content{
+position:relative;
+z-index:2;
 }
 
-.chart-frame{
-width:100%;
-height:600px;
-border:none;
-opacity:0.9; /* aquí controlas la transparencia */
+.hero h1{
+font-size:4rem;
+margin-bottom:20px;
+background:linear-gradient(90deg,#00c6ff,#0072ff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
 }
 
-    
+.hero p{
+font-size:1.2rem;
+color:#cbd5e1;
+margin-bottom:30px;
+}
+
+.btn-primary{
+padding:14px 28px;
+border-radius:12px;
+background:linear-gradient(90deg,#00c6ff,#0072ff);
+color:white;
+text-decoration:none;
+font-weight:600;
+transition:0.3s;
+display:inline-block;
+}
+
+.btn-primary:hover{
+transform:scale(1.05);
+box-shadow:0 0 25px rgba(0,198,255,0.6);
+}
+
 .btn{
 display:inline-flex;
 align-items:center;
@@ -455,41 +472,18 @@ animation:pulse 1.5s infinite;
   <div class="divider"></div>
 </header>
 
-<section class="chart-section">
 
-<div class="chart-clean">
+<section class="hero">
 
-<div id="tradingview_chart"></div>
+<canvas id="chartCanvas"></canvas>
 
+<div class="hero-content">
+  <h1>DAB COIN</h1>
+  <p>The Future of Decentralized Value</p>
+  <a href="#" class="btn-primary">Buy on PancakeSwap</a>
 </div>
 
 </section>
-
-<script src="https://s3.tradingview.com/tv.js"></script>
-
-<script>
-new TradingView.widget({
-  "container_id": "tradingview_chart",
-  "width": "100%",
-  "height": 600,
-  "symbol": "PANCAKESWAP:DABWBNB", 
-  "interval": "15",
-  "timezone": "Etc/UTC",
-  "theme": "dark",
-  "style": "1", 
-  "locale": "en",
-  "toolbar_bg": "#000000",
-  "hide_top_toolbar": true,
-  "hide_side_toolbar": true,
-  "allow_symbol_change": false,
-  "save_image": false,
-  "studies": [],
-  "details": false,
-  "hotlist": false,
-  "calendar": false,
-});
-</script>
-
 
 
 <section class="hero">
@@ -810,11 +804,66 @@ async function loadPairAge() {
 </script>
 
 <script>
+const canvas = document.getElementById("chartCanvas");
+const ctx = canvas.getContext("2d");
 
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
+let candles = [];
 
+function generateCandles(){
+  candles = [];
+  let price = canvas.height / 2;
 
+  for(let i = 0; i < 120; i++){
+    let open = price;
+    let change = (Math.random() - 0.5) * 80;
+    let close = open + change;
+    let high = Math.max(open, close) + Math.random()*30;
+    let low = Math.min(open, close) - Math.random()*30;
+
+    candles.push({open, close, high, low});
+    price = close;
+  }
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const candleWidth = canvas.width / candles.length;
+
+  candles.forEach((candle, i)=>{
+    let x = i * candleWidth;
+
+    ctx.strokeStyle = "#00c6ff";
+    ctx.beginPath();
+    ctx.moveTo(x + candleWidth/2, candle.high);
+    ctx.lineTo(x + candleWidth/2, candle.low);
+    ctx.stroke();
+
+    ctx.fillStyle = candle.close > candle.open ? "#00ff88" : "#ff3b3b";
+    ctx.fillRect(
+      x,
+      candle.open,
+      candleWidth - 2,
+      candle.close - candle.open
+    );
+  });
+
+  requestAnimationFrame(draw);
+}
+
+generateCandles();
+draw();
+
+window.addEventListener("resize",()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  generateCandles();
+});
 </script>
+
 
 
 
