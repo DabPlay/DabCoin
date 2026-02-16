@@ -271,14 +271,31 @@ background:rgba(255,255,255,0.04);
 backdrop-filter:blur(20px);
 padding:30px;
 border-radius:20px;
-width:350px;
+
+width:100%;
+max-width:350px;
+
+box-sizing:border-box;
+
 box-shadow:0 0 40px rgba(0,180,255,0.15);
 transition:0.4s;
 }
 
+
 .card:hover{
-transform:translateY(-8px);
+transform:translateY();
 box-shadow:0 0 60px rgba(0,180,255,0.35);
+}
+.market-section{
+display:flex;
+gap:40px;
+flex-wrap:wrap;
+justify-content:center;
+}
+@media(max-width:600px){
+.card{
+padding:20px;
+}
 }
 
 .card h3{
