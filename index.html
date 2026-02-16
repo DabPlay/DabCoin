@@ -711,7 +711,30 @@ function updatePairAge() {
 
 setInterval(updatePairAge, 1000);
 updatePairAge();
+
+
+
+
+  // Simular carga de 0.7s
+document.addEventListener("DOMContentLoaded", () => {
+  const pairAge = document.getElementById("pair-age");
+
+  // Guardamos el valor real
+  const realValue = pairAge.textContent;
+
+  // Ponemos loader
+  pairAge.textContent = "";
+  pairAge.classList.add("loading");
+
+  // Después de 0.7s, mostramos el valor real
+  setTimeout(() => {
+    pairAge.textContent = realValue;
+    pairAge.classList.remove("loading");
+  }, 700); // 700 ms
+});
+  
 </script>
+
 
 
 
