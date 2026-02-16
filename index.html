@@ -9,17 +9,12 @@
 <link rel="icon" type="image/png" href="logo.png">
 
 <style>
-  .loading {
-  font-weight: bold;
-  color: #555;
-}
-
 .loading::after {
   content: "";
   display: inline-block;
   width: 1em;
   text-align: left;
-  animation: dots 1s steps(3, end) infinite;
+  animation: dots 0.7s steps(3, end) infinite;
 }
 
 @keyframes dots {
@@ -36,6 +31,7 @@
     content: "...";
   }
 }
+
 
 /* CONTENEDOR */
 .stats {
