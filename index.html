@@ -9,6 +9,46 @@
 <link rel="icon" type="image/png" href="logo.png">
 
 <style>
+/* CONTENEDOR */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 16px;
+}
+
+/* TARJETAS */
+.stat-card {
+  background: linear-gradient(145deg, #1b2a3a, #162233);
+  border-radius: 18px;
+  padding: 18px 10px;
+  text-align: center;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255,255,255,0.03);
+  transition: 0.3s ease;
+}
+
+/* TITULO */
+.stat-card h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9fb3c8;
+  margin-bottom: 8px;
+}
+
+/* VALOR */
+.stat-card p {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* EFECTO HOVER (desktop) */
+.stat-card:hover {
+  transform: translateY(-3px);
+}
 
 
 .btn-primary{
