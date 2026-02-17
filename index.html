@@ -1213,16 +1213,19 @@ function copyContract() {
 
 </script>
 <script>
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 async function addToMetaMask() {
 
-  const tokenAddress = "0x4E11b900c94b2ab9155330B2052827Ab74d183c5
-";
+  const tokenAddress = "0xTU_CONTRATO_REAL";
   const tokenSymbol = "DAB";
   const tokenDecimals = 18;
   const tokenImage = "https://tusitio.com/logo.png";
 
-  // 🟢 Caso 1: MetaMask detectado
-  if (typeof window.ethereum !== "undefined") {
+  // Si MetaMask existe
+  if (window.ethereum) {
     try {
       await window.ethereum.request({
         method: "wallet_watchAsset",
@@ -1236,27 +1239,26 @@ async function addToMetaMask() {
           },
         },
       });
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
 
   } else {
 
-    // 📱 Caso 2: Móvil → abrir en MetaMask app
+    // Si es móvil → abrir MetaMask app
     if (isMobile()) {
-      const dappUrl = window.location.href.replace(/^https?:\/\//, '');
-      window.location.href = `https://metamask.app.link/dapp/${dappUrl}`;
+      const url = window.location.href.replace(/^https?:\/\//, '');
+      window.location.href = `https://metamask.app.link/dapp/${url}`;
       return;
     }
 
-    // 💻 Caso 3: No instalado en PC
-    document.getElementById("metamaskModal").style.display = "flex";
+    // Si es PC sin MetaMask → mostrar modal
+    const modal = document.getElementById("metamaskModal");
+    if (modal) modal.style.display = "flex";
   }
 }
-  function isMobile() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  }
 </script>
+
 
 
 <div id="copy-toast" class="copy-toast">
