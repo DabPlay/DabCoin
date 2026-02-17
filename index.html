@@ -864,13 +864,16 @@ style="border:none;border-radius:12px;">
         Utility-driven token powering rewards, remittances and a web game economy.
       </p>
 
-      <div class="contract-box">
-        <span id="contract">
-          0x4E11b900....74d183c5
-        </span>
-        <button onclick="copyContract()">Copy</button>
-      </div>
-    </div>
+<div class="contract-box">
+  <span id="contract"
+        data-address="0x4E11b900c94b2ab9155330B2052827Ab74d183c5
+">
+    0x4E11...83c5
+  </span>
+
+  <button onclick="copyContract()">Copy</button>
+</div>
+
 
     <!-- TOKENOMICS -->
     <div class="footer-col">
@@ -1261,9 +1264,11 @@ closeModal.addEventListener("click", () => {
 </script>
 <script>
 function copyContract() {
-  const text = document.getElementById("contract").innerText;
+  const address = document
+    .getElementById("contract")
+    .getAttribute("data-address");
 
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(address).then(() => {
     const toast = document.getElementById("copy-toast");
     toast.classList.add("show");
 
@@ -1273,6 +1278,7 @@ function copyContract() {
   });
 }
 </script>
+
 
 
 
