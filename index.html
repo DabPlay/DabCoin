@@ -46,13 +46,7 @@
   border-top: 1px solid rgba(0,255,255,0.1);
 }
 
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 60px;
-}
+.footer-container {   max-width: 1200px;   margin: auto;   display: grid;   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));   gap: 40px; }
 @media (max-width: 900px) {
   .footer-container {
     grid-template-columns: 1fr;
