@@ -705,27 +705,27 @@ svg {
     </div>
   </div>
 <!-- BOTÓN -->
-<a href="#" id="addToMetaMask" class="metamask-btn">
+<button onclick="addToMetaMask()" class="btn">
+</button>
+
   <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
 </a>
-
-<!-- MODAL PREMIUM -->
-<div id="metamaskModal" class="mm-modal">
-  <div class="mm-content">
-    <div class="mm-icon">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-    </div>
-
+<div id="metamaskModal" style="display:none;" class="modal">
+  <div class="modal-content">
     <h3>MetaMask not detected</h3>
-    <p>Install MetaMask to add the token to your wallet.</p>
+    <p>Install MetaMask to add DAB to your wallet.</p>
 
     <a href="https://metamask.io/download/" target="_blank" class="install-btn">
-      Instalar MetaMask
+      Install MetaMask
     </a>
 
-    <button id="closeModal" class="close-btn">Close</button>
+    <button onclick="closeModal()" class="close-btn">
+      Close
+    </button>
   </div>
 </div>
+
+
 
 
 
@@ -1217,15 +1217,18 @@ function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
+function closeModal() {
+  document.getElementById("metamaskModal").style.display = "none";
+}
+
 async function addToMetaMask() {
 
-  const tokenAddress = "0x4E11b900c94b2ab9155330B2052827Ab74d183c5
-";
+  const tokenAddress = "0x4E11b900c94b2ab9155330B2052827Ab74d183c5";
   const tokenSymbol = "DAB";
   const tokenDecimals = 18;
-  const tokenImage = "https://tusitio.com/logo.png";
+  const tokenImage = "https://tusitio.com/logo.png"; // cambia si quieres
 
-  // Si MetaMask existe
+  // 🟢 Si MetaMask está disponible
   if (window.ethereum) {
     try {
       await window.ethereum.request({
@@ -1240,25 +1243,25 @@ async function addToMetaMask() {
           },
         },
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log("Error adding token:", error);
     }
 
   } else {
 
-    // Si es móvil → abrir MetaMask app
+    // 📱 Si es móvil → abrir dentro de MetaMask
     if (isMobile()) {
-      const url = window.location.href.replace(/^https?:\/\//, '');
-      window.location.href = `https://metamask.app.link/dapp/${url}`;
+      const currentUrl = window.location.href.replace(/^https?:\/\//, '');
+      window.location.href = `https://metamask.app.link/dapp/${currentUrl}`;
       return;
     }
 
-    // Si es PC sin MetaMask → mostrar modal
-    const modal = document.getElementById("metamaskModal");
-    if (modal) modal.style.display = "flex";
+    // 💻 Si es PC sin MetaMask → mostrar modal
+    document.getElementById("metamaskModal").style.display = "flex";
   }
 }
 </script>
+
 
 
 
