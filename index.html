@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -204,7 +204,7 @@
 }
 
 
-.metamask-btn img {
+.btn img {
   width: 30px;
 }
 
@@ -705,27 +705,30 @@ svg {
     </div>
   </div>
 <!-- BOTÓN -->
-<a href="#" id="addMetaMask" class="metamask-btn">
+<a href="#" id="addToMetaMask" class="btn">
   <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
 </a>
 
-<!-- MODAL PREMIUM -->
-<div id="metamaskModal" class="mm-modal">
-  <div class="mm-content">
+
+
+    <div id="metamaskModal" style="display:none;" class="modal">
+  <div class="modal-content">
     <div class="mm-icon">
       <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
     </div>
-
     <h3>MetaMask not detected</h3>
-    <p>Install MetaMask to add the token to your wallet.</p>
+    <p>Install MetaMask to add DAB to your wallet.</p>
 
     <a href="https://metamask.io/download/" target="_blank" class="install-btn">
-      Instalar MetaMask
+      Install MetaMask
     </a>
 
-    <button id="closeModal" class="close-btn">Close</button>
+    <button onclick="closeModal()" class="close-btn">
+      Close
+    </button>
   </div>
 </div>
+
 
 
 
@@ -1211,15 +1214,23 @@ function copyContract() {
 </script>
 
 <script>
-async function addMetaMask() {
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
 
-  const tokenAddress = "0xTU_CONTRATO_REAL";
+function closeModal() {
+  document.getElementById("metamaskModal").style.display = "none";
+}
+
+async function addToMetaMask() {
+
+  const tokenAddress = "0x4E11b900c94b2ab9155330B2052827Ab74d183c5";
   const tokenSymbol = "DAB";
   const tokenDecimals = 18;
-  const tokenImage = "https://tusitio.com/logo.png";
+  const tokenImage = "https://tusitio.com/logo.png"; // cambia si quieres
 
-  // 🟢 Caso 1: MetaMask detectado
-  if (typeof window.ethereum !== "undefined") {
+  // 🟢 Si MetaMask está disponible
+  if (window.ethereum) {
     try {
       await window.ethereum.request({
         method: "wallet_watchAsset",
@@ -1234,25 +1245,25 @@ async function addMetaMask() {
         },
       });
     } catch (error) {
-      console.log(error);
+      console.log("Error adding token:", error);
     }
 
   } else {
 
-    // 📱 Caso 2: Móvil → abrir en MetaMask app
+    // 📱 Si es móvil → abrir dentro de MetaMask
     if (isMobile()) {
-      const dappUrl = window.location.href.replace(/^https?:\/\//, '');
-      window.location.href = `https://metamask.app.link/dapp/${dappUrl}`;
+      const currentUrl = window.location.href.replace(/^https?:\/\//, '');
+      window.location.href = `https://metamask.app.link/dapp/${currentUrl}`;
       return;
     }
 
-    // 💻 Caso 3: No instalado en PC
+    // 💻 Si es PC sin MetaMask → mostrar modal
     document.getElementById("metamaskModal").style.display = "flex";
   }
 }
 </script>
 
-
+    
 
 <div id="copy-toast" class="copy-toast">
   ✅ Contract copied!
