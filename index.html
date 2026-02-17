@@ -306,34 +306,95 @@
   top: 50%;
   transform: translateY(-50%);
 }
+/* Fondo oscuro */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 10, 20, 0.85);
+  backdrop-filter: blur(6px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 
+/* Caja central */
+.modal-content {
+  background: linear-gradient(145deg, #0f1723, #0b111b);
+  padding: 35px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: #e6f0ff;
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.15);
+  border: 1px solid rgba(0, 224, 255, 0.15);
+  animation: fadeIn 0.3s ease;
+}
 
-/* BOTÓN INSTALAR */
+/* Título */
+.modal-content h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #00e0ff;
+  text-shadow: 0 0 8px rgba(0,224,255,0.5);
+}
+
+/* Texto */
+.modal-content p {
+  font-size: 14px;
+  margin-bottom: 25px;
+  color: #9fb3c8;
+}
+
+/* Botón instalar */
 .install-btn {
-  display: block;
-  margin-top: 20px;
-  padding: 12px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #f6851b, #e2761b);
-  color: white;
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #00e0ff;
+  color: #000;
   font-weight: 600;
   text-decoration: none;
-  transition: 0.3s;
+  transition: 0.3s ease;
 }
 
-/* BOTÓN CERRAR */
+.install-btn:hover {
+  background: #00bcd4;
+  box-shadow: 0 0 12px rgba(0,224,255,0.6);
+}
+
+/* Botón cerrar */
 .close-btn {
-  margin-top: 10px;
+  display: block;
+  margin: 15px auto 0;
   background: transparent;
-  border: none;
-  color: #aaa;
+  border: 1px solid #00e0ff;
+  color: #00e0ff;
+  padding: 8px 18px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.3s ease;
 }
 
-/* ANIMACIÓN */
-@keyframes pop {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.close-btn:hover {
+  background: #00e0ff;
+  color: #000;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 
@@ -762,23 +823,18 @@ svg {
 <body>
 <header class="site-header">
   <div class="header-container">
-    <div class="logo">
-      🦉 <span>DabCoin</span> 
-    </div>
+  <div class="logo">
+    🦉 DabCoin
   </div>
-<!-- BOTÓN -->
-<button>
 
   <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" class="wallet-icon" onclick="addToMetaMask()">
-</button>
-
 </div>
+
+
+
 
     <div id="metamaskModal" style="display:none;" class="modal">
   <div class="modal-content">
-    <div class="wallet-icon">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-    </div>
     <h3>MetaMask not detected</h3>
     <p>Install MetaMask to add DAB to your wallet.</p>
 
@@ -791,6 +847,7 @@ svg {
     </button>
   </div>
 </div>
+
 
 
 
