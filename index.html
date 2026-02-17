@@ -1191,77 +1191,7 @@ updatePairAge();
 
 
 
-<script>
-const addButton = document.getElementById("addMetaMask");
-const modal = document.getElementById("metamaskModal");
-const closeModal = document.getElementById("closeModal");
 
-const TOKEN_SYMBOL = "DAB";
-const TOKEN_DECIMALS = 18;
-const TOKEN_IMAGE = "https://tusitio.com/logo.png";
-
-// BNB Smart Chain Mainnet
-const BSC_CHAIN_ID = "0x38";
-
-addButton.addEventListener("click", async (e) => {
-  e.preventDefault();
-
-  if (!window.ethereum || !window.ethereum.isMetaMask) {
-    modal.classList.add("active");
-    return;
-  }
-
-  try {
-    // 1️⃣ Solicitar conexión
-    await window.ethereum.request({
-      method: "eth_requestAccounts"
-    });
-
-    // 2️⃣ Verificar red
-    const currentChain = await window.ethereum.request({
-      method: "eth_chainId"
-    });
-
-    if (currentChain !== BSC_CHAIN_ID) {
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: BSC_CHAIN_ID }]
-        });
-      } catch (switchError) {
-        alert("Cambia manualmente a BNB Smart Chain");
-        return;
-      }
-    }
-
-    // 3️⃣ Agregar token
-    const wasAdded = await window.ethereum.request({
-      method: "wallet_watchAsset",
-      params: {
-        type: "ERC20",
-        options: {
-          address: TOKEN_ADDRESS,
-          symbol: TOKEN_SYMBOL,
-          decimals: TOKEN_DECIMALS,
-          image: TOKEN_IMAGE
-        }
-      }
-    });
-
-    if (wasAdded) {
-      console.log("Token agregado");
-    }
-
-  } catch (error) {
-    console.error(error);
-  }
-});
-
-// Cerrar modal
-closeModal.addEventListener("click", () => {
-  modal.classList.remove("active");
-});
-</script>
 <script>
 function copyContract() {
   const address = document
@@ -1277,9 +1207,55 @@ function copyContract() {
     }, 2500);
   });
 }
+
+  
+
+
 </script>
+<script>
+async function addToMetaMask() {
 
+  const tokenAddress = "0xTU_CONTRATO_REAL";
+  const tokenSymbol = "DAB";
+  const tokenDecimals = 18;
+  const tokenImage = "https://tusitio.com/logo.png";
 
+  // 🟢 Caso 1: MetaMask detectado
+  if (typeof window.ethereum !== "undefined") {
+    try {
+      await window.ethereum.request({
+        method: "wallet_watchAsset",
+        params: {
+          type: "ERC20",
+          options: {
+            address: tokenAddress,
+            symbol: tokenSymbol,
+            decimals: tokenDecimals,
+            image: tokenImage,
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+  } else {
+
+    // 📱 Caso 2: Móvil → abrir en MetaMask app
+    if (isMobile()) {
+      const dappUrl = window.location.href.replace(/^https?:\/\//, '');
+      window.location.href = `https://metamask.app.link/dapp/${dappUrl}`;
+      return;
+    }
+
+    // 💻 Caso 3: No instalado en PC
+    document.getElementById("metamaskModal").style.display = "flex";
+  }
+}
+  function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+</script>
 
 
 <div id="copy-toast" class="copy-toast">
