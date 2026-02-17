@@ -48,11 +48,19 @@
 
 .footer-container {
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 40px;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 60px;
 }
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+}
+
 
 .footer-logo {
   font-size: 28px;
