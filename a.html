@@ -1,180 +1,25 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>GameSwap | DBN ⇄ DAB</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f1220;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .box {
-      background: #151933;
-      padding: 20px;
-      border-radius: 10px;
-      width: 360px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      background: #4f7cff;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: none;
-    }
-    .small {
-      font-size: 12px;
-      opacity: 0.8;
-    }
-  </style>
-</head>
+<html>
+<body style="background:black;color:white">
 
-<body>
+<button id="btn">Conectar MetaMask</button>
 
-<div class="box">
-  <h2>GameSwap</h2>
-
-  <button id="connectBtn">🔗 Conectar Wallet</button>
-  <p id="account" class="small"></p>
-
-  <hr>
-
-  <p>DBN Balance: <span id="dbnBal">0</span></p>
-  <p>DAB Balance: <span id="dabBal">0</span></p>
-
-  <hr>
-
-  <input id="amount" placeholder="Cantidad" />
-
-  <button id="buyBtn">Comprar DAB (DBN → DAB)</button>
-  <button id="sellBtn">Vender DAB (DAB → DBN)</button>
-
-  <p id="status" class="small"></p>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 
 <script>
-/* ================= CONFIG ================= */
-
-const DBN = "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD";
-const DAB = "0xc6Bb7959AC8113F03034C0996291B303482D1a00";
-const SWAP = "0x6DacE109E382f2fF407BB2974BD0BC88eDACB5BD";
-
-const ERC20_ABI = [
-  "function balanceOf(address) view returns (uint)",
-  "function approve(address,uint) returns (bool)",
-  "function allowance(address,address) view returns (uint)"
-];
-
-const SWAP_ABI = [
-  "function buy(uint256 dbnAmount) external",
-  "function sell(uint256 dabAmount) external"
-];
-
-/* ============== STATE ================= */
-
-let provider, signer, account;
-
-/* ============== WALLET ================= */
-
-async function connect() {
+document.getElementById("btn").onclick = async () => {
   if (!window.ethereum) {
-    alert("Instala MetaMask");
+    alert("MetaMask NO detectado");
     return;
   }
 
-  await ethereum.request({ method: "eth_requestAccounts" });
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-  signer = provider.getSigner();
-  account = await signer.getAddress();
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const signer = provider.getSigner();
+  const address = await signer.getAddress();
 
-  const net = await provider.getNetwork();
-  if (net.chainId !== 56) {
-    await ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0x38" }]
-    });
-  }
-
-  document.getElementById("account").innerText = account;
-  loadBalances();
-}
-
-/* ============== BALANCES ================= */
-
-async function loadBalances() {
-  const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
-  const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
-
-  const dbnBal = await dbn.balanceOf(account);
-  const dabBal = await dab.balanceOf(account);
-
-  document.getElementById("dbnBal").innerText =
-    ethers.utils.formatUnits(dbnBal, 18);
-
-  document.getElementById("dabBal").innerText =
-    ethers.utils.formatUnits(dabBal, 18);
-}
-
-/* ============== BUY ================= */
-
-async function buyDAB() {
-  const amount = document.getElementById("amount").value;
-  if (!amount) return;
-
-  const value = ethers.utils.parseUnits(amount, 18);
-  const dbn = new ethers.Contract(DBN, ERC20_ABI, signer);
-  const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
-
-  document.getElementById("status").innerText = "Aprobando DBN...";
-  await (await dbn.approve(SWAP, value)).wait();
-
-  document.getElementById("status").innerText = "Comprando DAB...";
-  await (await swap.buy(value)).wait();
-
-  document.getElementById("status").innerText = "✔ Compra exitosa";
-  loadBalances();
-}
-
-/* ============== SELL ================= */
-
-async function sellDAB() {
-  const amount = document.getElementById("amount").value;
-  if (!amount) return;
-
-  const value = ethers.utils.parseUnits(amount, 18);
-  const dab = new ethers.Contract(DAB, ERC20_ABI, signer);
-  const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
-
-  document.getElementById("status").innerText = "Aprobando DAB...";
-  await (await dab.approve(SWAP, value)).wait();
-
-  document.getElementById("status").innerText = "Vendiendo DAB...";
-  await (await swap.sell(value)).wait();
-
-  document.getElementById("status").innerText = "✔ Venta exitosa";
-  loadBalances();
-}
-
-/* ============== EVENTS ================= */
-
-document.getElementById("connectBtn").onclick = connect;
-document.getElementById("buyBtn").onclick = buyDAB;
-document.getElementById("sellBtn").onclick = sellDAB;
+  alert("Wallet conectada: " + address);
+};
 </script>
 
 </body>
