@@ -1820,8 +1820,11 @@ window.addEventListener("load", checkIfTokenAdded);
   <span class="toast-icon">✔</span>
   <span class="toast-message"></span>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 
-<!-- GAMESWAP SCRIPT -->
+
+</body>
+  <!-- GAMESWAP SCRIPT -->
 <script>
 /* ================= CONFIG ================= */
 
@@ -2005,7 +2008,7 @@ buyBtn.onclick = buyDAB;
 sellBtn.onclick = sellDAB;
 
 // Listen for account changes
-if (window.ethereum) {
+if (window.ethereum && window.ethereum.on) {
   window.ethereum.on('accountsChanged', (accounts) => {
     if (accounts.length === 0) {
       // Disconnected
@@ -2027,6 +2030,4 @@ if (window.ethereum) {
   });
 }
 </script>
-
-</body>
     </html>
