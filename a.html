@@ -883,56 +883,49 @@ svg {
 } 
 
 /* =========================
-   SWAP COMPONENT STYLES
+   GAMESWAP BOX STYLES
 ========================= */
-.swap-section {
+.gameswap-section {
   max-width: 480px;
   margin: 0 auto 60px auto;
   padding: 0 20px;
 }
 
-.swap-container {
+.gameswap-box {
   background: linear-gradient(145deg, #162233, #1b2a3a);
   border-radius: 24px;
-  padding: 30px;
+  padding: 35px;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 0 0 1px rgba(255,255,255,0.05);
   border: 1px solid rgba(0, 224, 255, 0.1);
-}
-
-.swap-header {
   text-align: center;
-  margin-bottom: 25px;
 }
 
-.swap-header h2 {
-  font-size: 24px;
+.gameswap-box h2 {
+  font-size: 28px;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 8px 0;
+  margin: 0 0 25px 0;
   background: linear-gradient(90deg, #00c6ff, #00e0ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.swap-header p {
-  font-size: 14px;
-  color: #9fb3c8;
-  margin: 0;
-}
-
-/* Wallet Connection */
-.wallet-connect {
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.wallet-btn-large {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 32px;
+  justify-content: center;
+  gap: 10px;
+}
+
+.gameswap-box h2::before {
+  content: "🎮";
+  font-size: 24px;
+  -webkit-text-fill-color: initial;
+}
+
+/* Connect Button */
+#connectBtn {
+  width: 100%;
+  padding: 16px 24px;
   background: linear-gradient(90deg, #00c6ff, #0072ff);
   color: white;
   border: none;
@@ -942,491 +935,214 @@ svg {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(0, 198, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.wallet-btn-large:hover {
+#connectBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 198, 255, 0.5);
 }
 
-.wallet-btn-large svg {
-  width: 24px;
-  height: 24px;
+#connectBtn.connected {
+  background: linear-gradient(90deg, #00ff88, #00c6ff);
 }
 
-.wallet-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  border: 1px solid rgba(0, 224, 255, 0.1);
-}
-
-.wallet-address {
+/* Account Display */
+#account {
   font-family: 'Courier New', monospace;
   font-size: 14px;
   color: #00e0ff;
+  margin: 0 0 20px 0;
+  word-break: break-all;
+  min-height: 20px;
 }
 
-.disconnect-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #9fb3c8;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.disconnect-btn:hover {
-  background: rgba(255, 71, 87, 0.2);
-  border-color: rgba(255, 71, 87, 0.4);
-  color: #ff4757;
-}
-
-/* Swap Interface */
-.swap-interface {
-  display: none;
-}
-
-.swap-interface.active {
-  display: block;
-}
-
-.swap-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 4px;
-  border-radius: 12px;
-}
-
-.swap-tab {
-  flex: 1;
-  padding: 12px;
-  background: transparent;
+/* Divider */
+.gameswap-box hr {
   border: none;
-  color: #9fb3c8;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,224,255,0.3), transparent);
+  margin: 25px 0;
 }
 
-.swap-tab.active {
-  background: linear-gradient(90deg, #00c6ff, #0072ff);
-  color: white;
-}
-
-.swap-tab:hover:not(.active) {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* Input Groups */
-.input-group {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 16px;
-  padding: 16px;
+/* Balance Display */
+.balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s ease;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
-.input-group:focus-within {
-  border-color: rgba(0, 224, 255, 0.3);
+.balance-row:last-of-type {
+  margin-bottom: 0;
+}
+
+.balance-label {
+  font-size: 14px;
+  color: #9fb3c8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.balance-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+}
+
+.token-icon-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.dbn-icon { background: linear-gradient(135deg, #00c6ff, #0072ff); }
+.dab-icon { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+
+/* Input */
+#amount {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+#amount:focus {
+  border-color: rgba(0, 224, 255, 0.5);
   box-shadow: 0 0 20px rgba(0, 198, 255, 0.1);
 }
 
-.input-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.input-label {
-  font-size: 12px;
-  color: #9fb3c8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.balance-display {
-  font-size: 12px;
-  color: #6f8197;
-}
-
-.input-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.token-selector {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 100px;
-}
-
-.token-selector:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.token-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.token-symbol {
-  font-size: 14px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.amount-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  font-size: 24px;
-  font-weight: 600;
-  text-align: right;
-  outline: none;
-  width: 100%;
-}
-
-.amount-input::placeholder {
+#amount::placeholder {
   color: #4a5568;
 }
 
-/* Swap Arrow */
-.swap-arrow-container {
-  display: flex;
-  justify-content: center;
-  margin: -6px 0;
-  position: relative;
-  z-index: 2;
+/* Action Buttons */
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.swap-arrow-btn {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(145deg, #1b2a3a, #162233);
-  border: 2px solid rgba(0, 224, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#buyBtn, #sellBtn {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #00e0ff;
 }
 
-.swap-arrow-btn:hover {
-  transform: rotate(180deg);
-  border-color: #00e0ff;
-  box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
-}
-
-.swap-arrow-btn svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Swap Details */
-.swap-details {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 16px 0;
-  font-size: 13px;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: #9fb3c8;
-}
-
-.detail-row:last-child {
-  margin-bottom: 0;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  font-weight: 600;
-}
-
-/* Action Button */
-.swap-action-btn {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(90deg, #00c6ff, #0072ff);
-  border: none;
-  border-radius: 16px;
+#buyBtn {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
   color: white;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 8px;
-  box-shadow: 0 4px 20px rgba(0, 198, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
 }
 
-.swap-action-btn:hover:not(:disabled) {
+#buyBtn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 198, 255, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 198, 255, 0.5);
 }
 
-.swap-action-btn:disabled {
-  background: #2d3748;
-  color: #718096;
+#sellBtn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+#sellBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+}
+
+#buyBtn:disabled, #sellBtn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
+  transform: none;
 }
 
-/* Approval Section */
-.approval-section {
-  display: none;
-  background: rgba(255, 193, 7, 0.1);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  text-align: center;
+/* Status */
+#status {
+  font-size: 14px;
+  color: #9fb3c8;
+  margin: 0;
+  min-height: 20px;
 }
 
-.approval-section.active {
-  display: block;
+#status.success {
+  color: #00ff88;
 }
 
-.approval-text {
-  font-size: 13px;
-  color: #ffc107;
-  margin-bottom: 12px;
+#status.error {
+  color: #ff4757;
 }
 
-.approve-btn {
-  background: linear-gradient(90deg, #ffc107, #ff9800);
-  color: #000;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+#status.loading {
+  color: #00e0ff;
+  animation: pulse 1.5s infinite;
 }
 
-.approve-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
-}
-
-/* Loading State */
-.swap-loading {
-  display: none;
-  text-align: center;
-  padding: 40px;
-}
-
-.swap-loading.active {
-  display: block;
-}
-
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(0, 198, 255, 0.1);
-  border-top-color: #00c6ff;
+/* Loading spinner for status */
+.status-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(0, 224, 255, 0.3);
+  border-top-color: #00e0ff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 16px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
-.loading-text {
-  color: #9fb3c8;
-  font-size: 14px;
-}
-
-/* Transaction Success */
-.tx-success {
-  display: none;
-  text-align: center;
-  padding: 30px;
-}
-
-.tx-success.active {
-  display: block;
-}
-
-.success-icon {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #00ff88, #00c6ff);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  animation: scaleIn 0.5s ease;
-}
-
-.success-icon svg {
-  width: 30px;
-  height: 30px;
-  color: white;
-}
-
-@keyframes scaleIn {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.tx-hash {
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: #00e0ff;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 8px 12px;
-  border-radius: 8px;
-  margin: 16px 0;
-  word-break: break-all;
-}
-
-.view-tx-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background: rgba(0, 224, 255, 0.1);
-  border: 1px solid #00e0ff;
-  color: #00e0ff;
-  text-decoration: none;
-  border-radius: 10px;
-  font-size: 13px;
-  transition: all 0.3s ease;
-}
-
-.view-tx-btn:hover {
-  background: #00e0ff;
-  color: #000;
-}
-
-.new-swap-btn {
-  margin-top: 12px;
-  background: transparent;
-  border: none;
-  color: #9fb3c8;
-  font-size: 13px;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-/* Error Message */
-.error-message {
-  display: none;
-  background: rgba(255, 71, 87, 0.1);
-  border: 1px solid rgba(255, 71, 87, 0.3);
-  color: #ff4757;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 13px;
-  margin-top: 12px;
-  text-align: center;
-}
-
-.error-message.active {
-  display: block;
-}
-
-/* Slippage Settings */
-.slippage-settings {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 12px;
-  color: #9fb3c8;
-}
-
-.slippage-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #9fb3c8;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.slippage-btn.active {
-  background: rgba(0, 198, 255, 0.2);
-  border-color: #00c6ff;
-  color: #00c6ff;
-}
-
-/* GameSwap Badge */
-.gameswap-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(90deg, #ff6b6b, #feca57);
-  color: #000;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 15px;
-}
-
-.gameswap-badge::before {
-  content: "🎮";
+/* Not connected state */
+.not-connected {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* Responsive */
-@media (max-width: 600px) {
-  .swap-container {
-    padding: 20px;
+@media (max-width: 480px) {
+  .gameswap-box {
+    padding: 25px 20px;
   }
   
-  .amount-input {
-    font-size: 20px;
+  .action-buttons {
+    grid-template-columns: 1fr;
   }
   
-  .token-selector {
-    min-width: 80px;
-    padding: 6px 10px;
-  }
-  
-  .token-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 10px;
+  .balance-row {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
   }
 }
 </style>
-<base target="_blank">
 </head>
 
 <body>
@@ -1529,179 +1245,42 @@ svg {
 
 </section>
 
-<!-- SWAP SECTION - GAMESWAP -->
-<section class="section swap-section">
-  <div class="swap-container">
-    <div class="swap-header">
-      <div class="gameswap-badge">Powered by GameSwap</div>
-      <h2>Swap Tokens</h2>
-      <p>Trade DBN and DAB instantly</p>
+<!-- GAMESWAP SECTION -->
+<section class="section gameswap-section">
+  <div class="gameswap-box">
+    <h2>GameSwap</h2>
+
+    <button id="connectBtn">🔗 Conectar Wallet</button>
+    <p id="account" class="small"></p>
+
+    <hr>
+
+    <div class="balance-row">
+      <span class="balance-label">
+        <span class="token-icon-small dbn-icon">DBN</span>
+        DBN Balance
+      </span>
+      <span class="balance-value" id="dbnBal">0.00</span>
+    </div>
+    
+    <div class="balance-row">
+      <span class="balance-label">
+        <span class="token-icon-small dab-icon">DAB</span>
+        DAB Balance
+      </span>
+      <span class="balance-value" id="dabBal">0.00</span>
     </div>
 
-    <!-- Wallet Not Connected -->
-    <div id="walletConnect" class="wallet-connect">
-      <button class="wallet-btn-large" onclick="connectWallet()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 7h-1V6a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3z"></path>
-          <line x1="16" y1="11" x2="16" y2="11"></line>
-        </svg>
-        Connect Wallet
-      </button>
+    <hr>
+
+    <input id="amount" placeholder="Cantidad" disabled />
+
+    <div class="action-buttons">
+      <button id="buyBtn" disabled>Comprar DAB (DBN → DAB)</button>
+      <button id="sellBtn" disabled>Vender DAB (DAB → DBN)</button>
     </div>
 
-    <!-- Wallet Connected -->
-    <div id="swapInterface" class="swap-interface">
-      <div class="wallet-info">
-        <span id="connectedAddress" class="wallet-address">0x...</span>
-        <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
-      </div>
-
-      <!-- Tabs -->
-      <div class="swap-tabs">
-        <button class="swap-tab active" onclick="setSwapMode('buy')">Buy DBN</button>
-        <button class="swap-tab" onclick="setSwapMode('convert')">DBN ↔ DAB</button>
-      </div>
-
-      <!-- Slippage Settings -->
-      <div class="slippage-settings">
-        <span>Slippage:</span>
-        <button class="slippage-btn active" onclick="setSlippage(0.5)">0.5%</button>
-        <button class="slippage-btn" onclick="setSlippage(1)">1%</button>
-        <button class="slippage-btn" onclick="setSlippage(2)">2%</button>
-      </div>
-
-      <!-- Buy DBN with USDT -->
-      <div id="buyPanel">
-        <div class="input-group">
-          <div class="input-header">
-            <span class="input-label">From</span>
-            <span class="balance-display">Balance: <span id="usdtBalance">0.00</span> USDT</span>
-          </div>
-          <div class="input-row">
-            <div class="token-selector">
-              <div class="token-icon" style="background: linear-gradient(135deg, #26a17b, #2eb872);">USDT</div>
-              <span class="token-symbol">USDT</span>
-            </div>
-            <input type="number" id="usdtAmount" class="amount-input" placeholder="0.0" oninput="calculateOutput()">
-          </div>
-        </div>
-
-        <div class="swap-arrow-container">
-          <div class="swap-arrow-btn" onclick="switchTokens()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <polyline points="19 12 12 19 5 12"></polyline>
-            </svg>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <div class="input-header">
-            <span class="input-label">To</span>
-            <span class="balance-display">Balance: <span id="dbnBalance">0.00</span> DBN</span>
-          </div>
-          <div class="input-row">
-            <div class="token-selector">
-              <div class="token-icon" style="background: linear-gradient(135deg, #00c6ff, #0072ff);">DBN</div>
-              <span class="token-symbol">DBN</span>
-            </div>
-            <input type="number" id="dbnOutput" class="amount-input" placeholder="0.0" readonly>
-          </div>
-        </div>
-      </div>
-
-      <!-- Convert DBN ↔ DAB -->
-      <div id="convertPanel" style="display: none;">
-        <div class="input-group">
-          <div class="input-header">
-            <span class="input-label">From</span>
-            <span class="balance-display">Balance: <span id="fromTokenBalance">0.00</span> <span id="fromTokenSymbol">DBN</span></span>
-          </div>
-          <div class="input-row">
-            <div class="token-selector" onclick="toggleConvertDirection()">
-              <div class="token-icon" id="fromTokenIcon" style="background: linear-gradient(135deg, #00c6ff, #0072ff);">DBN</div>
-              <span class="token-symbol" id="fromTokenSym">DBN</span>
-            </div>
-            <input type="number" id="convertAmount" class="amount-input" placeholder="0.0" oninput="calculateConvertOutput()">
-          </div>
-        </div>
-
-        <div class="swap-arrow-container">
-          <div class="swap-arrow-btn" onclick="toggleConvertDirection()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <polyline points="19 12 12 19 5 12"></polyline>
-            </svg>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <div class="input-header">
-            <span class="input-label">To</span>
-            <span class="balance-display">Balance: <span id="toTokenBalance">0.00</span> <span id="toTokenSymbol">DAB</span></span>
-          </div>
-          <div class="input-row">
-            <div class="token-selector">
-              <div class="token-icon" id="toTokenIcon" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);">DAB</div>
-              <span class="token-symbol" id="toTokenSym">DAB</span>
-            </div>
-            <input type="number" id="convertOutput" class="amount-input" placeholder="0.0" readonly>
-          </div>
-        </div>
-      </div>
-
-      <!-- Swap Details -->
-      <div class="swap-details">
-        <div class="detail-row">
-          <span>Exchange Rate</span>
-          <span id="exchangeRate">1 USDT ≈ 0 DBN</span>
-        </div>
-        <div class="detail-row">
-          <span>Network Fee</span>
-          <span>~$0.05</span>
-        </div>
-        <div class="detail-row">
-          <span>Price Impact</span>
-          <span id="priceImpact">&lt;0.01%</span>
-        </div>
-        <div class="detail-row">
-          <span>Minimum Received</span>
-          <span id="minReceived">0 DBN</span>
-        </div>
-      </div>
-
-      <!-- Approval Section -->
-      <div id="approvalSection" class="approval-section">
-        <div class="approval-text">⚠️ Token approval required before swapping</div>
-        <button class="approve-btn" onclick="approveToken()">Approve Token</button>
-      </div>
-
-      <!-- Error Message -->
-      <div id="errorMessage" class="error-message"></div>
-
-      <!-- Action Button -->
-      <button id="swapActionBtn" class="swap-action-btn" onclick="executeSwap()">Enter an amount</button>
-    </div>
-
-    <!-- Loading State -->
-    <div id="swapLoading" class="swap-loading">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">Processing transaction...</div>
-    </div>
-
-    <!-- Success State -->
-    <div id="txSuccess" class="tx-success">
-      <div class="success-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-      </div>
-      <h3 style="color: #00ff88; margin: 0 0 8px 0;">Transaction Successful!</h3>
-      <p style="color: #9fb3c8; font-size: 14px; margin: 0 0 16px 0;">Your swap has been completed via GameSwap</p>
-      <div id="txHash" class="tx-hash">0x...</div>
-      <a id="viewTxLink" href="#" target="_blank" class="view-tx-btn">View on BSCScan</a>
-      <button class="new-swap-btn" onclick="resetSwap()">Make another swap</button>
-    </div>
+    <p id="status" class="small"></p>
   </div>
 </section>
 
@@ -2244,575 +1823,209 @@ window.addEventListener("load", checkIfTokenAdded);
 
 <!-- GAMESWAP SCRIPT -->
 <script>
-// GameSwap Configuration
+/* ================= CONFIG ================= */
+
 const DBN = "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD";
 const DAB = "0xc6Bb7959AC8113F03034C0996291B303482D1a00";
 const SWAP = "0x6DacE109E382f2fF407BB2974BD0BC88eDACB5BD";
 
-// Token Configurations
-const TOKENS = {
-  USDT: {
-    address: "0x55d398326f99059ff775485246999027b3197955",
-    decimals: 18,
-    symbol: "USDT",
-    name: "Tether USD",
-    color: "linear-gradient(135deg, #26a17b, #2eb872)"
-  },
-  DBN: {
-    address: DBN,
-    decimals: 18,
-    symbol: "DBN",
-    name: "DABOIN",
-    color: "linear-gradient(135deg, #00c6ff, #0072ff)"
-  },
-  DAB: {
-    address: DAB,
-    decimals: 18,
-    symbol: "DAB",
-    name: "DAB Token",
-    color: "linear-gradient(135deg, #ff6b6b, #ee5a24)"
-  }
-};
-
-// GameSwap Router ABI (Standard DEX Router)
-const GAMESWAP_ABI = [
-  "function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts)",
-  "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)",
-  "function swapExactTokensForTokensSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external",
-  "function WETH() external pure returns (address)",
-  "function factory() external pure returns (address)"
-];
-
 const ERC20_ABI = [
-  "function balanceOf(address account) external view returns (uint256)",
-  "function decimals() external view returns (uint8)",
-  "function symbol() external view returns (string)",
-  "function approve(address spender, uint256 amount) external returns (bool)",
-  "function allowance(address owner, address spender) external view returns (uint256)",
-  "function totalSupply() external view returns (uint256)"
+  "function balanceOf(address) view returns (uint)",
+  "function approve(address,uint) returns (bool)",
+  "function allowance(address,address) view returns (uint)"
 ];
 
-// State
-let currentAccount = null;
-let signer = null;
-let web3Provider = null;
-let currentMode = 'buy'; // 'buy' or 'convert'
-let convertDirection = 'dbnToDab'; // 'dbnToDab' or 'dabToDbn'
-let slippage = 0.5;
-let tokenPrices = {
-  dbn: 0,
-  dab: 0
-};
+const SWAP_ABI = [
+  "function buy(uint256 dbnAmount) external",
+  "function sell(uint256 dabAmount) external"
+];
 
-// Initialize
-async function initSwap() {
-  if (window.ethereum) {
-    web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-    
-    // Check if already connected
-    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-    if (accounts.length > 0) {
-      await connectWallet();
-    }
-    
-    // Listen for account changes
-    window.ethereum.on('accountsChanged', (accounts) => {
-      if (accounts.length === 0) {
-        disconnectWallet();
-      } else {
-        currentAccount = accounts[0];
-        updateWalletDisplay();
-        loadBalances();
-      }
-    });
-    
-    // Listen for chain changes
-    window.ethereum.on('chainChanged', () => {
-      window.location.reload();
-    });
-  }
-}
+/* ============== STATE ================= */
 
-async function connectWallet() {
+let provider, signer, account;
+
+/* ============== DOM ELEMENTS ================= */
+
+const connectBtn = document.getElementById("connectBtn");
+const accountDisplay = document.getElementById("account");
+const dbnBalDisplay = document.getElementById("dbnBal");
+const dabBalDisplay = document.getElementById("dabBal");
+const amountInput = document.getElementById("amount");
+const buyBtn = document.getElementById("buyBtn");
+const sellBtn = document.getElementById("sellBtn");
+const statusDisplay = document.getElementById("status");
+
+/* ============== WALLET ================= */
+
+async function connect() {
   if (!window.ethereum) {
-    showError("Please install MetaMask to use this feature");
+    showStatus("Instala MetaMask", "error");
     return;
   }
-  
+
   try {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    currentAccount = accounts[0];
-    web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = web3Provider.getSigner();
-    
-    // Check if on BSC
-    const network = await web3Provider.getNetwork();
-    if (network.chainId !== 56) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x38' }], // BSC Mainnet
-        });
-      } catch (switchError) {
-        if (switchError.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: '0x38',
-              chainName: 'Binance Smart Chain',
-              nativeCurrency: {
-                name: 'BNB',
-                symbol: 'bnb',
-                decimals: 18
-              },
-              rpcUrls: ['https://bsc-dataseed.binance.org/'],
-              blockExplorerUrls: ['https://bscscan.com']
-            }]
-          });
-        }
-      }
+    await ethereum.request({ method: "eth_requestAccounts" });
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    account = await signer.getAddress();
+
+    const net = await provider.getNetwork();
+    if (net.chainId !== 56) {
+      await ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x38" }]
+      });
     }
+
+    // Update UI
+    connectBtn.innerHTML = "✅ Wallet Conectada";
+    connectBtn.classList.add("connected");
+    accountDisplay.innerText = account.substring(0, 6) + "..." + account.substring(account.length - 4);
     
-    showSwapInterface();
-    updateWalletDisplay();
-    await loadBalances();
-    await loadPrices();
+    // Enable inputs
+    amountInput.disabled = false;
+    buyBtn.disabled = false;
+    sellBtn.disabled = false;
+    
+    loadBalances();
+    showStatus("Wallet conectada correctamente", "success");
     
   } catch (error) {
-    console.error("Connection error:", error);
-    showError("Failed to connect wallet");
+    console.error(error);
+    showStatus("Error al conectar: " + error.message, "error");
   }
 }
 
-function disconnectWallet() {
-  currentAccount = null;
-  signer = null;
-  document.getElementById('walletConnect').style.display = 'block';
-  document.getElementById('swapInterface').classList.remove('active');
-}
-
-function showSwapInterface() {
-  document.getElementById('walletConnect').style.display = 'none';
-  document.getElementById('swapInterface').classList.add('active');
-}
-
-function updateWalletDisplay() {
-  if (currentAccount) {
-    const shortAddress = currentAccount.substring(0, 6) + '...' + currentAccount.substring(currentAccount.length - 4);
-    document.getElementById('connectedAddress').textContent = shortAddress;
-  }
-}
+/* ============== BALANCES ================= */
 
 async function loadBalances() {
-  if (!currentAccount || !web3Provider) return;
+  if (!account || !provider) return;
   
   try {
-    // Load USDT Balance
-    const usdtContract = new ethers.Contract(TOKENS.USDT.address, ERC20_ABI, web3Provider);
-    const usdtBalance = await usdtContract.balanceOf(currentAccount);
-    document.getElementById('usdtBalance').textContent = parseFloat(ethers.utils.formatUnits(usdtBalance, 18)).toFixed(2);
-    
-    // Load DBN Balance
-    const dbnContract = new ethers.Contract(DBN, ERC20_ABI, web3Provider);
-    const dbnBalance = await dbnContract.balanceOf(currentAccount);
-    document.getElementById('dbnBalance').textContent = parseFloat(ethers.utils.formatUnits(dbnBalance, 18)).toFixed(2);
-    
-    // Load DAB Balance
-    const dabContract = new ethers.Contract(DAB, ERC20_ABI, web3Provider);
-    const dabBalance = await dabContract.balanceOf(currentAccount);
-    
-    // Update convert panel balances
-    updateConvertBalances(dabBalance, dbnBalance);
-    
+    const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
+    const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
+
+    const dbnBal = await dbn.balanceOf(account);
+    const dabBal = await dab.balanceOf(account);
+
+    dbnBalDisplay.innerText = parseFloat(ethers.utils.formatUnits(dbnBal, 18)).toFixed(4);
+    dabBalDisplay.innerText = parseFloat(ethers.utils.formatUnits(dabBal, 18)).toFixed(4);
   } catch (error) {
     console.error("Error loading balances:", error);
   }
 }
 
-function updateConvertBalances(dabBalance, dbnBalance) {
-  const dbnFormatted = parseFloat(ethers.utils.formatUnits(dbnBalance || 0, 18)).toFixed(2);
-  const dabFormatted = parseFloat(ethers.utils.formatUnits(dabBalance || 0, 18)).toFixed(2);
-  
-  if (convertDirection === 'dbnToDab') {
-    document.getElementById('fromTokenBalance').textContent = dbnFormatted;
-    document.getElementById('toTokenBalance').textContent = dabFormatted;
-  } else {
-    document.getElementById('fromTokenBalance').textContent = dabFormatted;
-    document.getElementById('toTokenBalance').textContent = dbnFormatted;
-  }
-}
+/* ============== BUY ================= */
 
-async function loadPrices() {
+async function buyDAB() {
+  const amount = amountInput.value;
+  if (!amount || parseFloat(amount) <= 0) {
+    showStatus("Ingresa una cantidad válida", "error");
+    return;
+  }
+
   try {
-    // Get prices from GameSwap
-    const gameswap = new ethers.Contract(SWAP, GAMESWAP_ABI, web3Provider || provider);
-    
-    // Try to get DBN price via USDT
-    try {
-      const amountIn = ethers.utils.parseUnits("1", 18);
-      const path = [TOKENS.USDT.address, DBN];
-      const amounts = await gameswap.getAmountsOut(amountIn, path);
-      tokenPrices.dbn = parseFloat(ethers.utils.formatUnits(amounts[1], 18));
-    } catch (e) {
-      console.log("Could not get DBN price from GameSwap");
-      tokenPrices.dbn = 0;
+    const value = ethers.utils.parseUnits(amount, 18);
+    const dbn = new ethers.Contract(DBN, ERC20_ABI, signer);
+    const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
+
+    // Check allowance
+    const allowance = await dbn.allowance(account, SWAP);
+    if (allowance.lt(value)) {
+      showStatus("Aprobando DBN...", "loading");
+      const approveTx = await dbn.approve(SWAP, value);
+      await approveTx.wait();
     }
-    
-    // Try to get DAB price via USDT
-    try {
-      const amountIn = ethers.utils.parseUnits("1", 18);
-      const path = [TOKENS.USDT.address, DAB];
-      const amounts = await gameswap.getAmountsOut(amountIn, path);
-      tokenPrices.dab = parseFloat(ethers.utils.formatUnits(amounts[1], 18));
-    } catch (e) {
-      console.log("Could not get DAB price from GameSwap");
-      tokenPrices.dab = 0;
-    }
-    
-  } catch (error) {
-    console.error("Error loading prices:", error);
-  }
-}
 
-function setSwapMode(mode) {
-  currentMode = mode;
-  
-  // Update tabs
-  document.querySelectorAll('.swap-tab').forEach(tab => tab.classList.remove('active'));
-  event.target.classList.add('active');
-  
-  // Show/hide panels
-  if (mode === 'buy') {
-    document.getElementById('buyPanel').style.display = 'block';
-    document.getElementById('convertPanel').style.display = 'none';
-  } else {
-    document.getElementById('buyPanel').style.display = 'none';
-    document.getElementById('convertPanel').style.display = 'block';
-  }
-  
-  clearInputs();
-  updateExchangeRate();
-}
-
-function setSlippage(value) {
-  slippage = value;
-  document.querySelectorAll('.slippage-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
-  calculateOutput();
-}
-
-function toggleConvertDirection() {
-  convertDirection = convertDirection === 'dbnToDab' ? 'dabToDbn' : 'dbnToDab';
-  
-  // Update UI
-  const fromIcon = document.getElementById('fromTokenIcon');
-  const fromSym = document.getElementById('fromTokenSym');
-  const toIcon = document.getElementById('toTokenIcon');
-  const toSym = document.getElementById('toTokenSym');
-  const fromTokenSymbol = document.getElementById('fromTokenSymbol');
-  const toTokenSymbol = document.getElementById('toTokenSymbol');
-  
-  if (convertDirection === 'dbnToDab') {
-    fromIcon.textContent = 'DBN';
-    fromIcon.style.background = TOKENS.DBN.color;
-    fromSym.textContent = 'DBN';
-    toIcon.textContent = 'DAB';
-    toIcon.style.background = TOKENS.DAB.color;
-    toSym.textContent = 'DAB';
-    fromTokenSymbol.textContent = 'DBN';
-    toTokenSymbol.textContent = 'DAB';
-  } else {
-    fromIcon.textContent = 'DAB';
-    fromIcon.style.background = TOKENS.DAB.color;
-    fromSym.textContent = 'DAB';
-    toIcon.textContent = 'DBN';
-    toIcon.style.background = TOKENS.DBN.color;
-    toSym.textContent = 'DBN';
-    fromTokenSymbol.textContent = 'DAB';
-    toTokenSymbol.textContent = 'DBN';
-  }
-  
-  loadBalances();
-  calculateConvertOutput();
-}
-
-async function calculateOutput() {
-  const input = parseFloat(document.getElementById('usdtAmount').value) || 0;
-  
-  if (input > 0) {
-    try {
-      const gameswap = new ethers.Contract(SWAP, GAMESWAP_ABI, web3Provider || provider);
-      const amountIn = ethers.utils.parseUnits(input.toString(), 18);
-      const path = [TOKENS.USDT.address, DBN];
-      
-      const amounts = await gameswap.getAmountsOut(amountIn, path);
-      const output = parseFloat(ethers.utils.formatUnits(amounts[1], 18));
-      
-      document.getElementById('dbnOutput').value = output.toFixed(6);
-      
-      // Calculate minimum received with slippage
-      const minReceived = output * (1 - slippage / 100);
-      document.getElementById('minReceived').textContent = minReceived.toFixed(6) + ' DBN';
-      
-      // Update exchange rate
-      const rate = output / input;
-      document.getElementById('exchangeRate').textContent = `1 USDT ≈ ${rate.toFixed(2)} DBN`;
-      
-      // Update button
-      document.getElementById('swapActionBtn').textContent = 'Swap via GameSwap';
-      document.getElementById('swapActionBtn').disabled = false;
-      
-      // Check allowance
-      checkAllowance(TOKENS.USDT.address, input);
-    } catch (error) {
-      console.error("Error calculating output:", error);
-      document.getElementById('dbnOutput').value = '';
-      document.getElementById('swapActionBtn').textContent = 'Insufficient liquidity';
-      document.getElementById('swapActionBtn').disabled = true;
-    }
-  } else {
-    document.getElementById('dbnOutput').value = '';
-    document.getElementById('minReceived').textContent = '0 DBN';
-    document.getElementById('swapActionBtn').textContent = 'Enter an amount';
-    document.getElementById('swapActionBtn').disabled = true;
-  }
-}
-
-async function calculateConvertOutput() {
-  const input = parseFloat(document.getElementById('convertAmount').value) || 0;
-  
-  if (input > 0) {
-    try {
-      const gameswap = new ethers.Contract(SWAP, GAMESWAP_ABI, web3Provider || provider);
-      const amountIn = ethers.utils.parseUnits(input.toString(), 18);
-      
-      let path;
-      if (convertDirection === 'dbnToDab') {
-        path = [DBN, DAB];
-      } else {
-        path = [DAB, DBN];
-      }
-      
-      const amounts = await gameswap.getAmountsOut(amountIn, path);
-      const output = parseFloat(ethers.utils.formatUnits(amounts[1], 18));
-      
-      document.getElementById('convertOutput').value = output.toFixed(6);
-      
-      const minReceived = output * (1 - slippage / 100);
-      const toSymbol = convertDirection === 'dbnToDab' ? 'DAB' : 'DBN';
-      document.getElementById('minReceived').textContent = minReceived.toFixed(6) + ' ' + toSymbol;
-      
-      const rate = output / input;
-      document.getElementById('exchangeRate').textContent = `1 ${convertDirection === 'dbnToDab' ? 'DBN' : 'DAB'} ≈ ${rate.toFixed(2)} ${toSymbol}`;
-      
-      document.getElementById('swapActionBtn').textContent = 'Convert via GameSwap';
-      document.getElementById('swapActionBtn').disabled = false;
-      
-      const tokenAddress = convertDirection === 'dbnToDab' ? DBN : DAB;
-      checkAllowance(tokenAddress, input);
-    } catch (error) {
-      console.error("Error calculating convert output:", error);
-      document.getElementById('convertOutput').value = '';
-      document.getElementById('swapActionBtn').textContent = 'Insufficient liquidity';
-      document.getElementById('swapActionBtn').disabled = true;
-    }
-  } else {
-    document.getElementById('convertOutput').value = '';
-    const toSymbol = convertDirection === 'dbnToDab' ? 'DAB' : 'DBN';
-    document.getElementById('minReceived').textContent = '0 ' + toSymbol;
-    document.getElementById('swapActionBtn').textContent = 'Enter an amount';
-    document.getElementById('swapActionBtn').disabled = true;
-  }
-}
-
-async function checkAllowance(tokenAddress, amount) {
-  if (!signer || !currentAccount) return;
-  
-  try {
-    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
-    const allowance = await tokenContract.allowance(currentAccount, SWAP);
-    const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
-    
-    if (allowance.lt(amountWei)) {
-      document.getElementById('approvalSection').classList.add('active');
-      document.getElementById('swapActionBtn').style.display = 'none';
-    } else {
-      document.getElementById('approvalSection').classList.remove('active');
-      document.getElementById('swapActionBtn').style.display = 'block';
-    }
-  } catch (error) {
-    console.error("Error checking allowance:", error);
-  }
-}
-
-async function approveToken() {
-  if (!signer) return;
-  
-  const button = event.target;
-  button.textContent = 'Approving...';
-  button.disabled = true;
-  
-  try {
-    let tokenAddress;
-    if (currentMode === 'buy') {
-      tokenAddress = TOKENS.USDT.address;
-    } else {
-      tokenAddress = convertDirection === 'dbnToDab' ? DBN : DAB;
-    }
-    
-    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
-    const tx = await tokenContract.approve(SWAP, ethers.constants.MaxUint256);
-    
+    showStatus("Comprando DAB...", "loading");
+    const tx = await swap.buy(value);
     await tx.wait();
-    
-    document.getElementById('approvalSection').classList.remove('active');
-    document.getElementById('swapActionBtn').style.display = 'block';
-    showError("Token approved successfully!", "success");
+
+    showStatus("✔ Compra exitosa", "success");
+    loadBalances();
+    amountInput.value = "";
     
   } catch (error) {
-    console.error("Approval error:", error);
-    showError("Approval failed: " + error.message);
-  } finally {
-    button.textContent = 'Approve Token';
-    button.disabled = false;
+    console.error(error);
+    showStatus("Error: " + (error.reason || error.message), "error");
   }
 }
 
-async function executeSwap() {
-  if (!signer || !currentAccount) return;
-  
-  document.getElementById('swapInterface').classList.remove('active');
-  document.getElementById('swapLoading').classList.add('active');
-  
+/* ============== SELL ================= */
+
+async function sellDAB() {
+  const amount = amountInput.value;
+  if (!amount || parseFloat(amount) <= 0) {
+    showStatus("Ingresa una cantidad válida", "error");
+    return;
+  }
+
   try {
-    const gameswap = new ethers.Contract(SWAP, GAMESWAP_ABI, signer);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes
-    
-    let tx;
-    
-    if (currentMode === 'buy') {
-      // Buy DBN with USDT
-      const amountIn = ethers.utils.parseUnits(document.getElementById('usdtAmount').value, 18);
-      const output = parseFloat(document.getElementById('dbnOutput').value);
-      const amountOutMin = ethers.utils.parseUnits(
-        (output * (1 - slippage / 100)).toString(),
-        18
-      );
-      
-      const path = [TOKENS.USDT.address, DBN];
-      
-      tx = await gameswap.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-        amountIn,
-        amountOutMin,
-        path,
-        currentAccount,
-        deadline
-      );
-    } else {
-      // Convert DBN ↔ DAB
-      const amountIn = ethers.utils.parseUnits(document.getElementById('convertAmount').value, 18);
-      const output = parseFloat(document.getElementById('convertOutput').value);
-      const amountOutMin = ethers.utils.parseUnits(
-        (output * (1 - slippage / 100)).toString(),
-        18
-      );
-      
-      let path;
-      if (convertDirection === 'dbnToDab') {
-        path = [DBN, DAB];
-      } else {
-        path = [DAB, DBN];
-      }
-      
-      tx = await gameswap.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-        amountIn,
-        amountOutMin,
-        path,
-        currentAccount,
-        deadline
-      );
+    const value = ethers.utils.parseUnits(amount, 18);
+    const dab = new ethers.Contract(DAB, ERC20_ABI, signer);
+    const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
+
+    // Check allowance
+    const allowance = await dab.allowance(account, SWAP);
+    if (allowance.lt(value)) {
+      showStatus("Aprobando DAB...", "loading");
+      const approveTx = await dab.approve(SWAP, value);
+      await approveTx.wait();
     }
-    
-    const receipt = await tx.wait();
-    
-    showSuccess(receipt.transactionHash);
-    await loadBalances();
+
+    showStatus("Vendiendo DAB...", "loading");
+    const tx = await swap.sell(value);
+    await tx.wait();
+
+    showStatus("✔ Venta exitosa", "success");
+    loadBalances();
+    amountInput.value = "";
     
   } catch (error) {
-    console.error("Swap error:", error);
-    document.getElementById('swapLoading').classList.remove('active');
-    document.getElementById('swapInterface').classList.add('active');
-    showError("Swap failed: " + (error.reason || error.message));
+    console.error(error);
+    showStatus("Error: " + (error.reason || error.message), "error");
   }
 }
 
-function showSuccess(txHash) {
-  document.getElementById('swapLoading').classList.remove('active');
-  document.getElementById('txSuccess').classList.add('active');
+/* ============== UI HELPERS ================= */
+
+function showStatus(message, type) {
+  statusDisplay.innerText = message;
+  statusDisplay.className = "small " + type;
   
-  const shortHash = txHash.substring(0, 10) + '...' + txHash.substring(txHash.length - 8);
-  document.getElementById('txHash').textContent = shortHash;
-  document.getElementById('viewTxLink').href = `https://bscscan.com/tx/${txHash}`;
-}
-
-function resetSwap() {
-  document.getElementById('txSuccess').classList.remove('active');
-  document.getElementById('swapInterface').classList.add('active');
-  clearInputs();
-}
-
-function clearInputs() {
-  document.getElementById('usdtAmount').value = '';
-  document.getElementById('dbnOutput').value = '';
-  document.getElementById('convertAmount').value = '';
-  document.getElementById('convertOutput').value = '';
-  document.getElementById('swapActionBtn').textContent = 'Enter an amount';
-  document.getElementById('swapActionBtn').disabled = true;
-  document.getElementById('approvalSection').classList.remove('active');
-  document.getElementById('swapActionBtn').style.display = 'block';
-  hideError();
-}
-
-function showError(message, type = 'error') {
-  const errorDiv = document.getElementById('errorMessage');
-  errorDiv.textContent = message;
-  errorDiv.classList.add('active');
-  
-  if (type === 'success') {
-    errorDiv.style.background = 'rgba(0, 255, 136, 0.1)';
-    errorDiv.style.borderColor = 'rgba(0, 255, 136, 0.3)';
-    errorDiv.style.color = '#00ff88';
-  } else {
-    errorDiv.style.background = 'rgba(255, 71, 87, 0.1)';
-    errorDiv.style.borderColor = 'rgba(255, 71, 87, 0.3)';
-    errorDiv.style.color = '#ff4757';
-  }
-  
-  setTimeout(() => {
-    hideError();
-  }, 5000);
-}
-
-function hideError() {
-  document.getElementById('errorMessage').classList.remove('active');
-}
-
-function switchTokens() {
-  // For buy panel, switching means selling DBN for USDT
-  showError("Sell functionality coming soon! Use GameSwap directly for now.");
-}
-
-function updateExchangeRate() {
-  if (currentMode === 'buy') {
-    document.getElementById('exchangeRate').textContent = '1 USDT ≈ 0 DBN';
-  } else {
-    const rate = convertDirection === 'dbnToDab' ? '1 DBN ≈ 0 DAB' : '1 DAB ≈ 0 DBN';
-    document.getElementById('exchangeRate').textContent = rate;
+  if (type === "loading") {
+    statusDisplay.innerHTML = '<span class="status-spinner"></span>' + message;
   }
 }
 
-// Initialize on load
-window.addEventListener('load', initSwap);
+/* ============== EVENTS ================= */
+
+connectBtn.onclick = connect;
+buyBtn.onclick = buyDAB;
+sellBtn.onclick = sellDAB;
+
+// Listen for account changes
+if (window.ethereum) {
+  window.ethereum.on('accountsChanged', (accounts) => {
+    if (accounts.length === 0) {
+      // Disconnected
+      connectBtn.innerHTML = "🔗 Conectar Wallet";
+      connectBtn.classList.remove("connected");
+      accountDisplay.innerText = "";
+      amountInput.disabled = true;
+      buyBtn.disabled = true;
+      sellBtn.disabled = true;
+      dbnBalDisplay.innerText = "0.00";
+      dabBalDisplay.innerText = "0.00";
+      showStatus("", "");
+    } else {
+      // Account changed
+      account = accounts[0];
+      accountDisplay.innerText = account.substring(0, 6) + "..." + account.substring(account.length - 4);
+      loadBalances();
+    }
+  });
+}
 </script>
 
 </body>
