@@ -1846,7 +1846,87 @@ let provider, signer, account;
 
 /* ============== DOM ELEMENTS ================= */
 
-const connectBtn = document.getElementById("connectBtn");
+document.getElementById("connectBtn").onclick = async () => {
+  if (!window.ethereum) {
+    alert("MetaMask no detectado");
+    return;
+  }
+
+  provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = provider.getSigner();
+  userAddress = await signer.getAddress();
+
+  document.getElementById("account").innerText =
+    userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+
+  document.getElementById("connectBtn").classList.add("connected");
+  document.getElementById("connectBtn").innerText = "Wallet Conectada";
+
+  await loadBalances();
+
+  document.getElementById("amount").disabled = false;
+  document.getElementById("buyBtn").onclick = async () => {
+  try {
+    setStatus("Comprando DAB...", "loading");
+
+    const amount = document.getElementById("amount").value;
+    if (!amount || amount <= 0) return;
+
+    const dbn = new ethers.Contract(DBN_TOKEN, ERC20_ABI, signer);
+    const swap = new ethers.Contract(SWAP_CONTRACT, SWAP_ABI, signer);
+
+    const decimals = await dbn.decimals();
+    const value = ethers.utils.parseUnits(amount, decimals);
+
+    const allowance = await dbn.allowance(userAddress, SWAP_CONTRACT);
+    if (allowance.lt(value)) {
+      const txApprove = await dbn.approve(SWAP_CONTRACT, value);
+      await txApprove.wait();
+    }
+
+    const tx = await swap.buy(value);
+    await tx.wait();
+
+    setStatus("Compra completada ✔", "success");
+    await loadBalances();
+
+  } catch (err) {
+    console.error(err);
+    setStatus("Error en la compra", "error");
+  }
+};
+document.getElementById("sellBtn").onclick = async () => {
+  try {
+    setStatus("Vendiendo DAB...", "loading");
+
+    const amount = document.getElementById("amount").value;
+    if (!amount || amount <= 0) return;
+
+    const dab = new ethers.Contract(DAB_TOKEN, ERC20_ABI, signer);
+    const swap = new ethers.Contract(SWAP_CONTRACT, SWAP_ABI, signer);
+
+    const decimals = await dab.decimals();
+    const value = ethers.utils.parseUnits(amount, decimals);
+
+    const allowance = await dab.allowance(userAddress, SWAP_CONTRACT);
+    if (allowance.lt(value)) {
+      const txApprove = await dab.approve(SWAP_CONTRACT, value);
+      await txApprove.wait();
+    }
+
+    const tx = await swap.sell(value);
+    await tx.wait();
+
+    setStatus("Venta completada ✔", "success");
+    await loadBalances();
+
+  } catch (err) {
+    console.error(err);
+    setStatus("Error en la venta", "error");
+  }
+};
+};
 const accountDisplay = document.getElementById("account");
 const dbnBalDisplay = document.getElementById("dbnBal");
 const dabBalDisplay = document.getElementById("dabBal");
@@ -1854,7 +1934,11 @@ const amountInput = document.getElementById("amount");
 const buyBtn = document.getElementById("buyBtn");
 const sellBtn = document.getElementById("sellBtn");
 const statusDisplay = document.getElementById("status");
-
+function setStatus(text, type) {
+  const el = document.getElementById("status");
+  el.innerText = text;
+  el.className = type;
+}
 /* ============== WALLET ================= */
 
 async function connect() {
@@ -1899,20 +1983,20 @@ async function connect() {
 /* ============== BALANCES ================= */
 
 async function loadBalances() {
-  if (!account || !provider) return;
-  
-  try {
-    const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
-    const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
+  const dbn = new ethers.Contract(DBN_TOKEN, ERC20_ABI, provider);
+  const dab = new ethers.Contract(DAB_TOKEN, ERC20_ABI, provider);
 
-    const dbnBal = await dbn.balanceOf(account);
-    const dabBal = await dab.balanceOf(account);
+  const dbnDecimals = await dbn.decimals();
+  const dabDecimals = await dab.decimals();
 
-    dbnBalDisplay.innerText = parseFloat(ethers.utils.formatUnits(dbnBal, 18)).toFixed(4);
-    dabBalDisplay.innerText = parseFloat(ethers.utils.formatUnits(dabBal, 18)).toFixed(4);
-  } catch (error) {
-    console.error("Error loading balances:", error);
-  }
+  const dbnBal = await dbn.balanceOf(userAddress);
+  const dabBal = await dab.balanceOf(userAddress);
+
+  document.getElementById("dbnBal").innerText =
+    ethers.utils.formatUnits(dbnBal, dbnDecimals);
+
+  document.getElementById("dabBal").innerText =
+    ethers.utils.formatUnits(dabBal, dabDecimals);
 }
 
 /* ============== BUY ================= */
