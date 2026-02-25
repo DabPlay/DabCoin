@@ -157,77 +157,18 @@ $("sell").onclick = async () => {
     status(e.reason || e.toString(), false);
   }
 };
-    // ===== QUOTES (VIEW ONLY) =====
 
-function quoteBuy(uint256 dbnIn)
-    external
-    view
-    returns (
-        uint256 dabOut,
-        uint256 feeDBN,
-        uint256 price
-    )
-{
-    if (dbnIn == 0 || paused || circuitBreaker) {
-        return (0, 0, getPrice());
-    }
-
-    uint256 fee = (dbnIn * buyFee) / DENOM;
-    uint256 net = dbnIn - fee;
-
-    price = getPrice();
-    dabOut = (net * 1e18) / price;
-    feeDBN = fee;
-}
-
-function quoteSell(uint256 dabIn)
-    external
-    view
-    returns (
-        uint256 dbnOut,
-        uint256 feeDBN,
-        uint256 price,
-        bool allowed
-    )
-{
-    if (dabIn == 0 || paused || circuitBreaker) {
-        return (0, 0, getPrice(), false);
-    }
-
-    uint256 supply = DAB.totalSupply();
-
-    uint256 reservePrice = getReservePrice(supply);
-    uint256 curvePrice = getCurvePrice(supply);
-    price = (reservePrice + curvePrice) / 2;
-
-    uint256 gross = (dabIn * price) / 1e18;
-
-    if (gross > reserveDBN) {
-        return (0, 0, price, false);
-    }
-
-    uint256 reserveRatio = (reserveDBN * 1e18) / (supply * price);
-
-    uint256 sellFee = reserveRatio < 1e18
-        ? baseSellFee + 500
-        : baseSellFee;
-
-    uint256 fee = (gross * sellFee) / DENOM;
-
-    dbnOut = gross - fee;
-    feeDBN = fee;
-    allowed = true;
-}
     const preview = $("preview");
 
 $("amount").oninput = async () => {
   preview.textContent = "";
+  $("status").textContent = "";
+
   const amount = $("amount").value;
   if (!amount || amount <= 0 || !provider) return;
 
   try {
     const swap = new ethers.Contract(SWAP, SWAP_ABI, provider);
-
     const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
     const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
 
@@ -236,16 +177,26 @@ $("amount").oninput = async () => {
       dab.decimals()
     ]);
 
-    // === PREVIEW BUY ===
-    const dbnIn = ethers.utils.parseUnits(amount, dbnDec);
-    const [dabOut, fee, price] = await swap.quoteBuy(dbnIn);
+    if (mode === "buy") {
+      const dbnIn = ethers.utils.parseUnits(amount, dbnDec);
+      const [dabOut, fee] = await swap.quoteBuy(dbnIn);
 
-    if (dabOut.gt(0)) {
-      preview.textContent =
-        `Comprar → Recibes ${ethers.utils.formatUnits(dabOut, dabDec)} DAB | Fee: ${ethers.utils.formatUnits(fee, dbnDec)} DBN`;
+      if (dabOut.gt(0)) {
+        preview.textContent =
+          `Comprar → Recibes ${ethers.utils.formatUnits(dabOut, dabDec)} DAB | Fee: ${ethers.utils.formatUnits(fee, dbnDec)} DBN`;
+      }
     }
 
-  } catch {
+    if (mode === "sell") {
+      const dabIn = ethers.utils.parseUnits(amount, dabDec);
+      const [dbnOut, fee, , allowed] = await swap.quoteSell(dabIn);
+
+      preview.textContent = allowed
+        ? `Vender → Recibes ${ethers.utils.formatUnits(dbnOut, dbnDec)} DBN | Fee: ${ethers.utils.formatUnits(fee, dbnDec)} DBN`
+        : "Venta no permitida (reserva / límites)";
+    }
+
+  } catch (e) {
     preview.textContent = "";
   }
 };
