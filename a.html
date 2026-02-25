@@ -1,188 +1,106 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>GameSwap</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <style>
-    body { font-family: Arial; background:#0f1117; color:#fff; }
-    button { padding:10px; margin:5px; cursor:pointer; }
-    input { padding:8px; width:200px; }
-    .ok { color:#4caf50 }
-    .err { color:#f44336 }
-  </style>
+  <title>DAB → DBN Redemption</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.min.js"></script>
 </head>
-<body>
+<body style="font-family: Arial; background:#111; color:white; text-align:center; padding-top:50px;">
 
-<h2>🎮 GameSwap</h2>
+<h2>DAB → DBN Redemption</h2>
 
-<button id="connect">Conectar Wallet</button>
-<p id="account"></p>
+<button onclick="connectWallet()">Connect Wallet</button>
 
-<hr>
+<p id="wallet"></p>
+<p id="dabBalance"></p>
+<p id="dbnAvailable"></p>
+<p id="priceInfo"></p>
 
-<p>DBN: <span id="dbnBal">-</span></p>
-<p>DAB: <span id="dabBal">-</span></p>
-
-<input id="amount" placeholder="Cantidad" disabled />
-
+<input type="number" id="dabAmount" placeholder="DAB to redeem" />
 <br><br>
 
-<button id="buy" disabled>Comprar DAB</button>
-<button id="sell" disabled>Vender DAB</button>
+<button onclick="approveDAB()">Approve DAB</button>
+<button onclick="redeemDAB()">Redeem</button>
 
-<p id="preview"></p>
 <p id="status"></p>
 
 <script>
-let provider, signer, user;
+let provider;
+let signer;
+let user;
 
-const SWAP = "0xE1d8F4306eF5F0f43804E485Cf9434988ECC828b";
-const DBN  = "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD";
-const DAB  = "0x996fDE168B25dcA1A4aA9A2833e4fd6d7920B4c5";
+const DAB_ADDRESS = "0xYOUR_DAB_ADDRESS";
+const REDEMPTION_ADDRESS = "0xYOUR_REDEMPTION_ADDRESS";
 
-const ERC20_ABI = [
-  "function balanceOf(address) view returns (uint256)",
-  "function approve(address,uint256) returns (bool)",
-  "function allowance(address,address) view returns (uint256)",
-  "function decimals() view returns (uint8)"
+const DAB_ABI = [
+  "function approve(address spender, uint256 amount) external returns (bool)",
+  "function balanceOf(address account) external view returns (uint256)",
+  "function decimals() external view returns (uint8)"
 ];
 
-const SWAP_ABI = [
-  "function buy(uint256)",
-  "function sell(uint256)",
-  "function quoteBuy(uint256) view returns (uint256)",
-  "function quoteSell(uint256) view returns (uint256)",
-  "function paused() view returns (bool)"
+const REDEMPTION_ABI = [
+  "function redeem(uint256 dabAmount) external",
+  "function internalPrice() view returns (uint256)",
+  "function redeemableDBNPerDay() view returns (uint256)"
 ];
 
-const $ = id => document.getElementById(id);
-
-function status(msg, ok=true){
-  $("status").textContent = msg;
-  $("status").className = ok ? "ok" : "err";
-}
-
-// CONNECT
-$("connect").onclick = async () => {
-  if (!window.ethereum) return alert("Instala MetaMask");
-
-  provider = new ethers.providers.Web3Provider(window.ethereum);
+async function connectWallet() {
+  provider = new ethers.BrowserProvider(window.ethereum);
   await provider.send("eth_requestAccounts", []);
-  signer = provider.getSigner();
+  signer = await provider.getSigner();
   user = await signer.getAddress();
 
-  $("account").textContent = user;
+  document.getElementById("wallet").innerText = "Connected: " + user;
 
-  $("amount").disabled = false;
-  $("buy").disabled = false;
-  $("sell").disabled = false;
-
-  await loadBalances();
-};
-
-// LOAD BALANCES
-async function loadBalances() {
-  const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
-  const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
-
-  const [dbnD, dabD] = await Promise.all([dbn.decimals(), dab.decimals()]);
-  const [dbnB, dabB] = await Promise.all([
-    dbn.balanceOf(user),
-    dab.balanceOf(user)
-  ]);
-
-  $("dbnBal").textContent = ethers.utils.formatUnits(dbnB, dbnD);
-  $("dabBal").textContent = ethers.utils.formatUnits(dabB, dabD);
+  loadData();
 }
 
-// PREVIEW
-$("amount").oninput = async () => {
-  const amount = $("amount").value;
-  $("preview").textContent = "";
-  if (!amount || !provider) return;
+async function loadData() {
+  const dab = new ethers.Contract(DAB_ADDRESS, DAB_ABI, provider);
+  const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, provider);
 
-  try {
-    const swap = new ethers.Contract(SWAP, SWAP_ABI, provider);
-    const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
-    const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
+  const balance = await dab.balanceOf(user);
+  const decimals = await dab.decimals();
+  const formatted = ethers.formatUnits(balance, decimals);
 
-    const [dbnDec, dabDec] = await Promise.all([
-      dbn.decimals(),
-      dab.decimals()
-    ]);
+  document.getElementById("dabBalance").innerText = "DAB Balance: " + formatted;
 
-    const dbnIn = ethers.utils.parseUnits(amount, dbnDec);
-    const dabOut = await swap.quoteBuy(dbnIn);
+  const price = await redemption.internalPrice();
+  const readablePrice = ethers.formatUnits(price, 18);
+  document.getElementById("priceInfo").innerText = "Internal Price (DBN per DAB): " + readablePrice;
 
-    $("preview").textContent =
-      `Comprar → Recibes ${ethers.utils.formatUnits(dabOut, dabDec)} DAB`;
+  const available = await redemption.redeemableDBNPerDay();
+  document.getElementById("dbnAvailable").innerText = "DBN Available Today: " + ethers.formatUnits(available, 18);
+}
 
-  } catch {}
-};
+async function approveDAB() {
+  const amount = document.getElementById("dabAmount").value;
+  const dab = new ethers.Contract(DAB_ADDRESS, DAB_ABI, signer);
+  const decimals = await dab.decimals();
 
-// BUY
-$("buy").onclick = async () => {
-  try {
-    const amount = $("amount").value;
-    if (!amount) return;
+  const parsed = ethers.parseUnits(amount, decimals);
+  const tx = await dab.approve(REDEMPTION_ADDRESS, parsed);
 
-    const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
-    const dbn = new ethers.Contract(DBN, ERC20_ABI, signer);
+  document.getElementById("status").innerText = "Approving...";
+  await tx.wait();
+  document.getElementById("status").innerText = "Approved!";
+}
 
-    if (await swap.paused()) throw "Swap pausado";
+async function redeemDAB() {
+  const amount = document.getElementById("dabAmount").value;
+  const dab = new ethers.Contract(DAB_ADDRESS, DAB_ABI, provider);
+  const decimals = await dab.decimals();
+  const parsed = ethers.parseUnits(amount, decimals);
 
-    const dec = await dbn.decimals();
-    const value = ethers.utils.parseUnits(amount, dec);
+  const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, signer);
+  const tx = await redemption.redeem(parsed);
 
-    const allowance = await dbn.allowance(user, SWAP);
-    if (allowance.lt(value)) {
-      status("Aprobando DBN...");
-      await (await dbn.approve(SWAP, value)).wait();
-    }
+  document.getElementById("status").innerText = "Redeeming...";
+  await tx.wait();
+  document.getElementById("status").innerText = "Redeemed successfully!";
 
-    status("Comprando...");
-    await (await swap.buy(value)).wait();
-
-    status("Compra completada ✔");
-    await loadBalances();
-
-  } catch (e) {
-    status(e.reason || e.message || e, false);
-  }
-};
-
-// SELL
-$("sell").onclick = async () => {
-  try {
-    const amount = $("amount").value;
-    if (!amount) return;
-
-    const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
-    const dab = new ethers.Contract(DAB, ERC20_ABI, signer);
-
-    if (await swap.paused()) throw "Swap pausado";
-
-    const dec = await dab.decimals();
-    const value = ethers.utils.parseUnits(amount, dec);
-
-    const allowance = await dab.allowance(user, SWAP);
-    if (allowance.lt(value)) {
-      status("Aprobando DAB...");
-      await (await dab.approve(SWAP, value)).wait();
-    }
-
-    status("Vendiendo...");
-    await (await swap.sell(value)).wait();
-
-    status("Venta completada ✔");
-    await loadBalances();
-
-  } catch (e) {
-    status(e.reason || e.message || e, false);
-  }
-};
-
+  loadData();
+}
 </script>
+
 </body>
 </html>
