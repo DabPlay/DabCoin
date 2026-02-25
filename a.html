@@ -6,7 +6,7 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
     body { font-family: Arial; background:#0f1117; color:#fff; }
-    button { padding:10px; margin:5px; }
+    button { padding:10px; margin:5px; cursor:pointer; }
     input { padding:8px; width:200px; }
     .ok { color:#4caf50 }
     .err { color:#f44336 }
@@ -30,11 +30,12 @@
 
 <button id="buy" disabled>Comprar DAB</button>
 <button id="sell" disabled>Vender DAB</button>
+
 <p id="preview"></p>
 <p id="status"></p>
- <script>
+
+<script>
 let provider, signer, user;
-let mode = "buy"; // 🔥 AGREGADO
 
 const SWAP = "0xE1d8F4306eF5F0f43804E485Cf9434988ECC828b";
 const DBN  = "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD";
@@ -42,7 +43,7 @@ const DAB  = "0x996fDE168B25dcA1A4aA9A2833e4fd6d7920B4c5";
 
 const ERC20_ABI = [
   "function balanceOf(address) view returns (uint256)",
-  "function approve(address,uint256)",
+  "function approve(address,uint256) returns (bool)",
   "function allowance(address,address) view returns (uint256)",
   "function decimals() view returns (uint8)"
 ];
@@ -57,14 +58,30 @@ const SWAP_ABI = [
 
 const $ = id => document.getElementById(id);
 
+function status(msg, ok=true){
+  $("status").textContent = msg;
+  $("status").className = ok ? "ok" : "err";
+}
+
+// CONNECT
 $("connect").onclick = async () => {
+  if (!window.ethereum) return alert("Instala MetaMask");
+
   provider = new ethers.providers.Web3Provider(window.ethereum);
   await provider.send("eth_requestAccounts", []);
   signer = provider.getSigner();
   user = await signer.getAddress();
+
+  $("account").textContent = user;
+
+  $("amount").disabled = false;
+  $("buy").disabled = false;
+  $("sell").disabled = false;
+
   await loadBalances();
 };
 
+// LOAD BALANCES
 async function loadBalances() {
   const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
   const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
@@ -79,36 +96,93 @@ async function loadBalances() {
   $("dabBal").textContent = ethers.utils.formatUnits(dabB, dabD);
 }
 
-$("buy").onclick = () => mode = "buy";
-$("sell").onclick = () => mode = "sell";
-
+// PREVIEW
 $("amount").oninput = async () => {
   const amount = $("amount").value;
+  $("preview").textContent = "";
   if (!amount || !provider) return;
 
-  const swap = new ethers.Contract(SWAP, SWAP_ABI, provider);
-  const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
-  const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
+  try {
+    const swap = new ethers.Contract(SWAP, SWAP_ABI, provider);
+    const dbn = new ethers.Contract(DBN, ERC20_ABI, provider);
+    const dab = new ethers.Contract(DAB, ERC20_ABI, provider);
 
-  const [dbnDec, dabDec] = await Promise.all([
-    dbn.decimals(),
-    dab.decimals()
-  ]);
+    const [dbnDec, dabDec] = await Promise.all([
+      dbn.decimals(),
+      dab.decimals()
+    ]);
 
-  if (mode === "buy") {
     const dbnIn = ethers.utils.parseUnits(amount, dbnDec);
     const dabOut = await swap.quoteBuy(dbnIn);
-    $("preview").textContent =
-      `Recibes ${ethers.utils.formatUnits(dabOut, dabDec)} DAB`;
-  }
 
-  if (mode === "sell") {
-    const dabIn = ethers.utils.parseUnits(amount, dabDec);
-    const dbnOut = await swap.quoteSell(dabIn);
     $("preview").textContent =
-      `Recibes ${ethers.utils.formatUnits(dbnOut, dbnDec)} DBN`;
+      `Comprar → Recibes ${ethers.utils.formatUnits(dabOut, dabDec)} DAB`;
+
+  } catch {}
+};
+
+// BUY
+$("buy").onclick = async () => {
+  try {
+    const amount = $("amount").value;
+    if (!amount) return;
+
+    const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
+    const dbn = new ethers.Contract(DBN, ERC20_ABI, signer);
+
+    if (await swap.paused()) throw "Swap pausado";
+
+    const dec = await dbn.decimals();
+    const value = ethers.utils.parseUnits(amount, dec);
+
+    const allowance = await dbn.allowance(user, SWAP);
+    if (allowance.lt(value)) {
+      status("Aprobando DBN...");
+      await (await dbn.approve(SWAP, value)).wait();
+    }
+
+    status("Comprando...");
+    await (await swap.buy(value)).wait();
+
+    status("Compra completada ✔");
+    await loadBalances();
+
+  } catch (e) {
+    status(e.reason || e.message || e, false);
   }
 };
+
+// SELL
+$("sell").onclick = async () => {
+  try {
+    const amount = $("amount").value;
+    if (!amount) return;
+
+    const swap = new ethers.Contract(SWAP, SWAP_ABI, signer);
+    const dab = new ethers.Contract(DAB, ERC20_ABI, signer);
+
+    if (await swap.paused()) throw "Swap pausado";
+
+    const dec = await dab.decimals();
+    const value = ethers.utils.parseUnits(amount, dec);
+
+    const allowance = await dab.allowance(user, SWAP);
+    if (allowance.lt(value)) {
+      status("Aprobando DAB...");
+      await (await dab.approve(SWAP, value)).wait();
+    }
+
+    status("Vendiendo...");
+    await (await swap.sell(value)).wait();
+
+    status("Venta completada ✔");
+    await loadBalances();
+
+  } catch (e) {
+    status(e.reason || e.message || e, false);
+  }
+};
+
 </script>
 </body>
 </html>
