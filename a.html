@@ -1,106 +1,208 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>DAB → DBN Redemption</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.min.js"></script>
+<meta charset="UTF-8">
+<title>Dabcoin Exchange</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    background: #0f172a;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 500px;
+    margin: 60px auto;
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.primary { background: #3b82f6; color: white; }
+.success { background: #16a34a; color: white; }
+.warning { background: #f59e0b; color: white; }
+
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    margin-top: 10px;
+}
+
+.info {
+    background: #0f172a;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.status {
+    margin-top: 15px;
+    text-align: center;
+}
+</style>
 </head>
-<body style="font-family: Arial; background:#111; color:white; text-align:center; padding-top:50px;">
+<body>
 
-<h2>DAB → DBN Redemption</h2>
+<div class="container">
+<h2>Dabcoin Exchange</h2>
 
-<button onclick="connectWallet()">Connect Wallet</button>
+<button class="primary" onclick="connectWallet()">Connect Wallet</button>
 
-<p id="wallet"></p>
-<p id="dabBalance"></p>
-<p id="dbnAvailable"></p>
-<p id="priceInfo"></p>
+<div class="info">
+<p id="wallet">Wallet: -</p>
+<p id="dabBalance">DAB Balance: -</p>
+<p id="dbnBalance">DBN Balance: -</p>
+<p id="price">Internal Price: -</p>
+<p id="daily">Daily DBN Available: -</p>
+</div>
 
-<input type="number" id="dabAmount" placeholder="DAB to redeem" />
-<br><br>
+<h3>Buy DAB</h3>
+<input type="number" id="buyAmount" placeholder="DBN amount">
+<button class="success" onclick="approveDBN()">Approve DBN</button>
+<button class="success" onclick="buyDAB()">Buy DAB</button>
 
-<button onclick="approveDAB()">Approve DAB</button>
-<button onclick="redeemDAB()">Redeem</button>
+<h3>Redeem DAB</h3>
+<input type="number" id="redeemAmount" placeholder="DAB amount">
+<button class="warning" onclick="approveDAB()">Approve DAB</button>
+<button class="warning" onclick="redeemDAB()">Redeem</button>
 
-<p id="status"></p>
+<p class="status" id="status"></p>
+</div>
 
 <script>
-let provider;
-let signer;
-let user;
 
 const DAB_ADDRESS = "0x9471052e67163Ac9eD01BAAe0894ec2f59313777";
-const REDEMPTION_ADDRESS = "0x379d02E48fF44cCDcb7Dea222aE823F5d0dEe18c";
+const DBN_ADDRESS = "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD";
+const REDEMPTION_ADDRESS = "0xA9f13D13a809aF809AEdaB12e1d35f310D3AAA1E";
 
-const DAB_ABI = [
-  "function approve(address spender, uint256 amount) external returns (bool)",
-  "function balanceOf(address account) external view returns (uint256)",
-  "function decimals() external view returns (uint8)"
+const ERC20_ABI = [
+    "function approve(address spender, uint256 amount) external returns (bool)",
+    "function balanceOf(address owner) view returns (uint256)",
+    "function decimals() view returns (uint8)"
 ];
 
 const REDEMPTION_ABI = [
-  "function redeem(uint256 dabAmount) external",
-  "function internalPrice() view returns (uint256)",
-  "function redeemableDBNPerDay() view returns (uint256)"
+    "function buyDAB(uint256 dbnAmount) external",
+    "function redeem(uint256 dabAmount) external",
+    "function internalPrice() view returns (uint256)",
+    "function redeemableDBNPerDay() view returns (uint256)"
 ];
 
+let provider, signer, user;
+
 async function connectWallet() {
-  provider = new ethers.BrowserProvider(window.ethereum);
-  await provider.send("eth_requestAccounts", []);
-  signer = await provider.getSigner();
-  user = await signer.getAddress();
+    provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = await provider.getSigner();
+    user = await signer.getAddress();
 
-  document.getElementById("wallet").innerText = "Connected: " + user;
-
-  loadData();
+    document.getElementById("wallet").innerText = "Wallet: " + user;
+    loadData();
 }
 
 async function loadData() {
-  const dab = new ethers.Contract(DAB_ADDRESS, DAB_ABI, provider);
-  const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, provider);
+    const dab = new ethers.Contract(DAB_ADDRESS, ERC20_ABI, provider);
+    const dbn = new ethers.Contract(DBN_ADDRESS, ERC20_ABI, provider);
+    const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, provider);
 
-  const balance = await dab.balanceOf(user);
-  const decimals = await dab.decimals();
-  const formatted = ethers.formatUnits(balance, decimals);
+    const dabBal = await dab.balanceOf(user);
+    const dbnBal = await dbn.balanceOf(user);
 
-  document.getElementById("dabBalance").innerText = "DAB Balance: " + formatted;
+    const dabDec = await dab.decimals();
+    const dbnDec = await dbn.decimals();
 
-  const price = await redemption.internalPrice();
-  const readablePrice = ethers.formatUnits(price, 18);
-  document.getElementById("priceInfo").innerText = "Internal Price (DBN per DAB): " + readablePrice;
+    document.getElementById("dabBalance").innerText =
+        "DAB Balance: " + ethers.formatUnits(dabBal, dabDec);
 
-  const available = await redemption.redeemableDBNPerDay();
-  document.getElementById("dbnAvailable").innerText = "DBN Available Today: " + ethers.formatUnits(available, 18);
+    document.getElementById("dbnBalance").innerText =
+        "DBN Balance: " + ethers.formatUnits(dbnBal, dbnDec);
+
+    const price = await redemption.internalPrice();
+    document.getElementById("price").innerText =
+        "Internal Price (DBN per DAB): " + ethers.formatUnits(price, 18);
+
+    const daily = await redemption.redeemableDBNPerDay();
+    document.getElementById("daily").innerText =
+        "Daily DBN Available: " + ethers.formatUnits(daily, dbnDec);
+}
+
+async function approveDBN() {
+    const amount = document.getElementById("buyAmount").value;
+    const dbn = new ethers.Contract(DBN_ADDRESS, ERC20_ABI, signer);
+    const decimals = await dbn.decimals();
+
+    const parsed = ethers.parseUnits(amount, decimals);
+    const tx = await dbn.approve(REDEMPTION_ADDRESS, parsed);
+
+    document.getElementById("status").innerText = "Approving DBN...";
+    await tx.wait();
+    document.getElementById("status").innerText = "DBN Approved!";
+}
+
+async function buyDAB() {
+    const amount = document.getElementById("buyAmount").value;
+    const dbn = new ethers.Contract(DBN_ADDRESS, ERC20_ABI, provider);
+    const decimals = await dbn.decimals();
+    const parsed = ethers.parseUnits(amount, decimals);
+
+    const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, signer);
+    const tx = await redemption.buyDAB(parsed);
+
+    document.getElementById("status").innerText = "Buying DAB...";
+    await tx.wait();
+    document.getElementById("status").innerText = "DAB Purchased!";
+    loadData();
 }
 
 async function approveDAB() {
-  const amount = document.getElementById("dabAmount").value;
-  const dab = new ethers.Contract(DAB_ADDRESS, DAB_ABI, signer);
-  const decimals = await dab.decimals();
+    const amount = document.getElementById("redeemAmount").value;
+    const dab = new ethers.Contract(DAB_ADDRESS, ERC20_ABI, signer);
+    const decimals = await dab.decimals();
 
-  const parsed = ethers.parseUnits(amount, decimals);
-  const tx = await dab.approve(REDEMPTION_ADDRESS, parsed);
+    const parsed = ethers.parseUnits(amount, decimals);
+    const tx = await dab.approve(REDEMPTION_ADDRESS, parsed);
 
-  document.getElementById("status").innerText = "Approving...";
-  await tx.wait();
-  document.getElementById("status").innerText = "Approved!";
+    document.getElementById("status").innerText = "Approving DAB...";
+    await tx.wait();
+    document.getElementById("status").innerText = "DAB Approved!";
 }
 
 async function redeemDAB() {
-  const amount = document.getElementById("dabAmount").value;
-  const dab = new ethers.Contract(DAB_ADDRESS, DAB_ABI, provider);
-  const decimals = await dab.decimals();
-  const parsed = ethers.parseUnits(amount, decimals);
+    const amount = document.getElementById("redeemAmount").value;
+    const dab = new ethers.Contract(DAB_ADDRESS, ERC20_ABI, provider);
+    const decimals = await dab.decimals();
+    const parsed = ethers.parseUnits(amount, decimals);
 
-  const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, signer);
-  const tx = await redemption.redeem(parsed);
+    const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, signer);
+    const tx = await redemption.redeem(parsed);
 
-  document.getElementById("status").innerText = "Redeeming...";
-  await tx.wait();
-  document.getElementById("status").innerText = "Redeemed successfully!";
-
-  loadData();
+    document.getElementById("status").innerText = "Redeeming...";
+    await tx.wait();
+    document.getElementById("status").innerText = "Redeemed!";
+    loadData();
 }
-</script>
 
+</script>
 </body>
 </html>
