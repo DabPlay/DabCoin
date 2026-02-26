@@ -112,13 +112,30 @@ const REDEMPTION_ABI = [
 let provider, signer, user;
 
 async function connectWallet() {
-    provider = new ethers.BrowserProvider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    signer = await provider.getSigner();
-    user = await signer.getAddress();
 
-    document.getElementById("wallet").innerText = "Wallet: " + user;
-    loadData();
+    if (typeof window.ethereum === "undefined") {
+        alert("Instala MetaMask");
+        return;
+    }
+
+    try {
+
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+
+        signer = provider.getSigner();
+        user = await signer.getAddress();
+
+        document.getElementById("wallet").innerText =
+            "Wallet: " + user;
+
+        loadData();
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("status").innerText =
+            "Error conectando wallet";
+    }
 }
 
 async function loadData() {
@@ -133,18 +150,18 @@ async function loadData() {
     const dbnDec = await dbn.decimals();
 
     document.getElementById("dabBalance").innerText =
-        "DAB Balance: " + ethers.formatUnits(dabBal, dabDec);
+        "DAB Balance: " + ethers.utils.formatUnits(dabBal, dabDec);
 
     document.getElementById("dbnBalance").innerText =
-        "DBN Balance: " + ethers.formatUnits(dbnBal, dbnDec);
+        "DBN Balance: " + ethers.utils.formatUnits(dbnBal, dbnDec);
 
     const price = await redemption.internalPrice();
     document.getElementById("price").innerText =
-        "Internal Price (DBN per DAB): " + ethers.formatUnits(price, 18);
+        "Internal Price (DBN per DAB): " + ethers.utils.formatUnits(price, 18);
 
     const daily = await redemption.redeemableDBNPerDay();
     document.getElementById("daily").innerText =
-        "Daily DBN Available: " + ethers.formatUnits(daily, dbnDec);
+        "Daily DBN Available: " + ethers.utils.formatUnits(daily, dbnDec);
 }
 
 async function approveDBN() {
@@ -152,7 +169,7 @@ async function approveDBN() {
     const dbn = new ethers.Contract(DBN_ADDRESS, ERC20_ABI, signer);
     const decimals = await dbn.decimals();
 
-    const parsed = ethers.parseUnits(amount, decimals);
+    const parsed = ethers.utils.parseUnits(amount, decimals);
     const tx = await dbn.approve(REDEMPTION_ADDRESS, parsed);
 
     document.getElementById("status").innerText = "Approving DBN...";
@@ -164,7 +181,7 @@ async function buyDAB() {
     const amount = document.getElementById("buyAmount").value;
     const dbn = new ethers.Contract(DBN_ADDRESS, ERC20_ABI, provider);
     const decimals = await dbn.decimals();
-    const parsed = ethers.parseUnits(amount, decimals);
+    const parsed = ethers.utils.parseUnits(amount, decimals);
 
     const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, signer);
     const tx = await redemption.buyDAB(parsed);
@@ -180,7 +197,7 @@ async function approveDAB() {
     const dab = new ethers.Contract(DAB_ADDRESS, ERC20_ABI, signer);
     const decimals = await dab.decimals();
 
-    const parsed = ethers.parseUnits(amount, decimals);
+    const parsed = ethers.utils.parseUnits(amount, decimals);
     const tx = await dab.approve(REDEMPTION_ADDRESS, parsed);
 
     document.getElementById("status").innerText = "Approving DAB...";
@@ -192,7 +209,7 @@ async function redeemDAB() {
     const amount = document.getElementById("redeemAmount").value;
     const dab = new ethers.Contract(DAB_ADDRESS, ERC20_ABI, provider);
     const decimals = await dab.decimals();
-    const parsed = ethers.parseUnits(amount, decimals);
+    const parsed = ethers.utils.parseUnits(amount, decimals);
 
     const redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, signer);
     const tx = await redemption.redeem(parsed);
