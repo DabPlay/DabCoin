@@ -2,245 +2,307 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Dabcoin Exchange</title>
+<title>DAB Exchange PRO</title>
 
-<!-- Ethers v5 (compatible con MetaMask) -->
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
-body {
-    margin: 0;
-    background: #0f172a;
-    color: white;
-    font-family: Arial, sans-serif;
+body{
+    margin:0;
+    background:#0f172a;
+    font-family:Arial;
+    color:white;
 }
 
-.container {
-    max-width: 500px;
-    margin: 60px auto;
-    background: #1e293b;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+.wrapper{
+    max-width:480px;
+    margin:40px auto;
+    background:#1e293b;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 0 25px rgba(0,0,0,.5);
 }
 
-h2 { text-align: center; }
+h2{text-align:center;margin-bottom:20px;}
 
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
+.card{
+    background:#0f172a;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
 }
 
-.primary { background: #3b82f6; color: white; }
-.success { background: #16a34a; color: white; }
-.warning { background: #f59e0b; color: white; }
-
-input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
-    margin-top: 10px;
+input{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    margin-top:8px;
+    font-size:16px;
 }
 
-.info {
-    background: #0f172a;
-    padding: 10px;
-    margin-top: 15px;
-    border-radius: 6px;
-    font-size: 14px;
+button{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:10px;
 }
 
-.status {
-    margin-top: 15px;
-    text-align: center;
-    font-size: 14px;
-}
+.primary{background:#3b82f6;color:white;}
+.success{background:#16a34a;color:white;}
+.danger{background:#ef4444;color:white;}
+.disabled{background:#555;cursor:not-allowed;}
+
+.info{font-size:14px;opacity:.85;margin-top:6px;}
+
+.status{text-align:center;margin-top:15px;font-size:14px;}
+.small{font-size:13px;opacity:.7;}
+.flex{display:flex;justify-content:space-between;}
+.max{cursor:pointer;color:#3b82f6;font-size:13px;}
 </style>
 </head>
 <body>
 
-<div class="container">
-<h2>Dabcoin Exchange</h2>
+<div class="wrapper">
+<h2>DAB Exchange</h2>
 
 <button class="primary" onclick="connectWallet()">Conectar Wallet</button>
 
-<div class="info">
-<p id="wallet">Wallet: -</p>
-<p id="dabBalance">DAB Balance: -</p>
-<p id="dbnBalance">DBN Balance: -</p>
-<p id="price">Internal Price: -</p>
-<p id="daily">Daily DBN Available: -</p>
+<div class="card">
+<div id="wallet">Wallet: -</div>
+<div id="balances"></div>
+<div id="priceInfo"></div>
 </div>
 
-<h3>Comprar DAB</h3>
-<input type="number" id="buyAmount" placeholder="Cantidad DBN">
-<button class="success" onclick="approveDBN()">Approve DBN</button>
-<button class="success" onclick="buyDAB()">Buy DAB</button>
+<!-- BUY -->
+<div class="card">
+<div class="flex">
+<span>Comprar DAB</span>
+<span class="max" onclick="setMaxBuy()">MAX</span>
+</div>
+<input type="number" id="buyInput" oninput="previewBuy()" placeholder="Cantidad DBN">
 
-<h3>Redimir DAB</h3>
-<input type="number" id="redeemAmount" placeholder="Cantidad DAB">
-<button class="warning" onclick="approveDAB()">Approve DAB</button>
-<button class="warning" onclick="redeemDAB()">Redeem</button>
-<p id="buyInfo"></p>
-<p id="redeemInfo"></p>
+<div class="info" id="buyPreview"></div>
+<button id="buyBtn" class="success" onclick="executeBuy()">Comprar DAB</button>
+</div>
 
-<button onclick="buyDAB()">Comprar DAB</button>
-<button onclick="redeemDAB()">Redimir DAB</button>
-<p class="status" id="status"></p>
+<!-- REDEEM -->
+<div class="card">
+<div class="flex">
+<span>Redimir DAB</span>
+<span class="max" onclick="setMaxRedeem()">MAX</span>
+</div>
+<input type="number" id="redeemInput" oninput="previewRedeem()" placeholder="Cantidad DAB">
+
+<div class="info" id="redeemPreview"></div>
+<button id="redeemBtn" class="danger" onclick="executeRedeem()">Redimir DAB</button>
+</div>
+
+<div class="status" id="status"></div>
+
 </div>
 
 <script>
 
-// ================= CONFIG =================
+// ========= CONFIG =========
 const DAB_ADDRESS = "0x9471052e67163Ac9eD01BAAe0894ec2f59313777";
 const DBN_ADDRESS = "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD";
 const REDEMPTION_ADDRESS = "0x379d02E48fF44cCDcb7Dea222aE823F5d0dEe18c";
-// ==========================================
+
+const BUY_FEE = 0.02;
+const REDEEM_FEE = 0.03;
+// ==========================
+
+let provider, signer, user;
+let dab, dbn, redemption;
+
+let dabBalance = 0;
+let dbnBalance = 0;
+let price = 0;
+let dailyLimit = 0;
 
 const ERC20_ABI = [
-    "function approve(address spender, uint256 amount) external returns (bool)",
-    "function balanceOf(address owner) view returns (uint256)",
-    "function decimals() view returns (uint8)"
+"function approve(address spender,uint256 amount) external returns(bool)",
+"function balanceOf(address owner) view returns(uint256)",
+"function decimals() view returns(uint8)"
 ];
 
 const REDEMPTION_ABI = [
-    "function buyDAB(uint256 dbnAmount) external",
-    "function redeem(uint256 dabAmount) external",
-    "function internalPrice() view returns (uint256)",
-    "function redeemableDBNPerDay() view returns (uint256)"
+"function buyDAB(uint256 dbnAmount) external",
+"function redeem(uint256 dabAmount) external",
+"function internalPrice() view returns(uint256)",
+"function redeemableDBNPerDay() view returns(uint256)"
 ];
 
-let provider, signer, user;
-let dabContract, dbnContract, redemption;
+// CONNECT
+async function connectWallet(){
 
-// ================= CONNECT =================
-async function connectWallet() {
+if(!window.ethereum){alert("Instala MetaMask");return;}
+if(!confirm("¿Conectar wallet?"))return;
 
-    if (!window.ethereum) {
-        alert("Instala MetaMask");
-        return;
-    }
+provider=new ethers.providers.Web3Provider(window.ethereum);
+await provider.send("eth_requestAccounts",[]);
+signer=provider.getSigner();
+user=await signer.getAddress();
 
-    if (!confirm("¿Conectar wallet?")) return;
+dab=new ethers.Contract(DAB_ADDRESS,ERC20_ABI,provider);
+dbn=new ethers.Contract(DBN_ADDRESS,ERC20_ABI,provider);
+redemption=new ethers.Contract(REDEMPTION_ADDRESS,REDEMPTION_ABI,provider);
 
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
+document.getElementById("wallet").innerText="Wallet: "+user;
 
-    signer = provider.getSigner();
-    user = await signer.getAddress();
-
-    dabContract = new ethers.Contract(DAB_ADDRESS, ERC20_ABI, provider);
-    dbnContract = new ethers.Contract(DBN_ADDRESS, ERC20_ABI, provider);
-    redemption = new ethers.Contract(REDEMPTION_ADDRESS, REDEMPTION_ABI, provider);
-
-    document.getElementById("wallet").innerText = "Wallet: " + user;
-
-    loadData();
+loadData();
 }
 
-// ================= LOAD DATA =================
-async function loadData() {
+// LOAD DATA
+async function loadData(){
 
-    const dabBal = await dabContract.balanceOf(user);
-    const dbnBal = await dbnContract.balanceOf(user);
+const dabRaw=await dab.balanceOf(user);
+const dbnRaw=await dbn.balanceOf(user);
+const dabDec=await dab.decimals();
+const dbnDec=await dbn.decimals();
 
-    const dabDec = await dabContract.decimals();
-    const dbnDec = await dbnContract.decimals();
+dabBalance=parseFloat(ethers.utils.formatUnits(dabRaw,dabDec));
+dbnBalance=parseFloat(ethers.utils.formatUnits(dbnRaw,dbnDec));
 
-    const price = await redemption.internalPrice();
-    const dailyLimit = await redemption.redeemableDBNPerDay();
+const priceRaw=await redemption.internalPrice();
+price=parseFloat(ethers.utils.formatUnits(priceRaw,18));
 
-    const dabFormatted = parseFloat(ethers.utils.formatUnits(dabBal, dabDec));
-    const dbnFormatted = parseFloat(ethers.utils.formatUnits(dbnBal, dbnDec));
-    const priceFormatted = parseFloat(ethers.utils.formatUnits(price, 18));
-    const dailyFormatted = parseFloat(ethers.utils.formatUnits(dailyLimit, dbnDec));
+const dailyRaw=await redemption.redeemableDBNPerDay();
+dailyLimit=parseFloat(ethers.utils.formatUnits(dailyRaw,dbnDec));
 
-    document.getElementById("dabBalance").innerText =
-        "Tienes: " + dabFormatted.toFixed(4) + " DAB";
+document.getElementById("balances").innerHTML=
+"Tienes "+dabBalance.toFixed(4)+" DAB<br>"+
+"Tienes "+dbnBalance.toFixed(4)+" DBN";
 
-    document.getElementById("dbnBalance").innerText =
-        "Tienes: " + dbnFormatted.toFixed(4) + " DBN";
+document.getElementById("priceInfo").innerHTML=
+"Precio: 1 DAB = "+price.toFixed(4)+" DBN<br>"+
+"Límite diario DBN: "+dailyLimit.toFixed(4);
 
-    document.getElementById("price").innerText =
-        "Precio interno: 1 DAB = " + priceFormatted.toFixed(4) + " DBN";
-
-    // CALCULAR COMPRA POSIBLE
-    const maxDabBuy = dbnFormatted / priceFormatted;
-
-    document.getElementById("buyInfo").innerText =
-        "Puedes comprar hasta: " + maxDabBuy.toFixed(4) + " DAB";
-
-    // CALCULAR REDEEM POSIBLE
-    const maxDbnFromDab = dabFormatted * priceFormatted;
-    const redeemableToday = Math.min(maxDbnFromDab, dailyFormatted);
-
-    document.getElementById("redeemInfo").innerText =
-        "Puedes retirar máximo: " + redeemableToday.toFixed(4) + " DBN hoy";
-
-    if (dailyFormatted === 0) {
-        document.getElementById("status").innerText =
-            "⚠ Límite diario alcanzado";
-    }
+previewBuy();
+previewRedeem();
 }
 
-// ================= BUY (AUTO APPROVE) =================
-async function buyDAB() {
-
-    document.getElementById("status").innerText =
-        "Esperando confirmación...";
-
-    const dbnWithSigner = dbnContract.connect(signer);
-    const redemptionWithSigner = redemption.connect(signer);
-
-    const dbnBal = await dbnContract.balanceOf(user);
-    const decimals = await dbnContract.decimals();
-
-    const tx1 = await dbnWithSigner.approve(REDEMPTION_ADDRESS, dbnBal);
-    await tx1.wait();
-
-    const tx2 = await redemptionWithSigner.buyDAB(dbnBal);
-    await tx2.wait();
-
-    document.getElementById("status").innerText =
-        "Compra completada";
-
-    loadData();
+// MAX BUTTONS
+function setMaxBuy(){
+document.getElementById("buyInput").value=dbnBalance;
+previewBuy();
 }
 
-// ================= REDEEM (AUTO APPROVE) =================
-async function redeemDAB() {
+function setMaxRedeem(){
+document.getElementById("redeemInput").value=dabBalance;
+previewRedeem();
+}
 
-    const dabBal = await dabContract.balanceOf(user);
-    const decimals = await dabContract.decimals();
+// PREVIEW BUY
+function previewBuy(){
 
-    if (dabBal == 0) {
-        document.getElementById("status").innerText =
-            "No tienes DAB suficiente";
-        return;
-    }
+const val=parseFloat(document.getElementById("buyInput").value);
+if(!val||val<=0){document.getElementById("buyPreview").innerHTML="";return;}
 
-    document.getElementById("status").innerText =
-        "Esperando confirmación...";
+if(val>dbnBalance){
+document.getElementById("buyPreview").innerHTML="❌ No tienes suficiente DBN";
+disable("buyBtn");return;
+}
 
-    const dabWithSigner = dabContract.connect(signer);
-    const redemptionWithSigner = redemption.connect(signer);
+const dabBruto=val/price;
+const fee=dabBruto*BUY_FEE;
+const neto=dabBruto-fee;
 
-    const tx1 = await dabWithSigner.approve(REDEMPTION_ADDRESS, dabBal);
-    await tx1.wait();
+document.getElementById("buyPreview").innerHTML=
+"Recibirás "+neto.toFixed(4)+" DAB<br>"+
+"Fee: "+fee.toFixed(4)+" DAB";
 
-    const tx2 = await redemptionWithSigner.redeem(dabBal);
-    await tx2.wait();
+enable("buyBtn");
+}
 
-    document.getElementById("status").innerText =
-        "Redimido correctamente";
+// PREVIEW REDEEM
+function previewRedeem(){
 
-    loadData();
+const val=parseFloat(document.getElementById("redeemInput").value);
+if(!val||val<=0){document.getElementById("redeemPreview").innerHTML="";return;}
+
+if(val>dabBalance){
+document.getElementById("redeemPreview").innerHTML="❌ No tienes suficiente DAB";
+disable("redeemBtn");return;
+}
+
+const dbnBruto=val*price;
+const fee=dbnBruto*REDEEM_FEE;
+const neto=dbnBruto-fee;
+
+if(neto>dailyLimit){
+document.getElementById("redeemPreview").innerHTML=
+"⚠ Supera límite diario. Máximo hoy: "+dailyLimit.toFixed(4)+" DBN";
+disable("redeemBtn");return;
+}
+
+document.getElementById("redeemPreview").innerHTML=
+"Recibirás "+neto.toFixed(4)+" DBN<br>"+
+"Fee: "+fee.toFixed(4)+" DBN";
+
+enable("redeemBtn");
+}
+
+// EXECUTE BUY
+async function executeBuy(){
+
+const val=parseFloat(document.getElementById("buyInput").value);
+if(!val)return;
+
+document.getElementById("status").innerText="Esperando confirmación...";
+
+const dbnSigner=dbn.connect(signer);
+const redemptionSigner=redemption.connect(signer);
+
+const dbnDec=await dbn.decimals();
+const parsed=ethers.utils.parseUnits(val.toString(),dbnDec);
+
+const tx1=await dbnSigner.approve(REDEMPTION_ADDRESS,parsed);
+await tx1.wait();
+
+const tx2=await redemptionSigner.buyDAB(parsed);
+await tx2.wait();
+
+document.getElementById("status").innerText="Compra completada ✔";
+loadData();
+}
+
+// EXECUTE REDEEM
+async function executeRedeem(){
+
+const val=parseFloat(document.getElementById("redeemInput").value);
+if(!val)return;
+
+document.getElementById("status").innerText="Esperando confirmación...";
+
+const dabSigner=dab.connect(signer);
+const redemptionSigner=redemption.connect(signer);
+
+const dabDec=await dab.decimals();
+const parsed=ethers.utils.parseUnits(val.toString(),dabDec);
+
+const tx1=await dabSigner.approve(REDEMPTION_ADDRESS,parsed);
+await tx1.wait();
+
+const tx2=await redemptionSigner.redeem(parsed);
+await tx2.wait();
+
+document.getElementById("status").innerText="Redimido ✔";
+loadData();
+}
+
+function disable(id){
+document.getElementById(id).classList.add("disabled");
+document.getElementById(id).disabled=true;
+}
+
+function enable(id){
+document.getElementById(id).classList.remove("disabled");
+document.getElementById(id).disabled=false;
 }
 
 </script>
