@@ -1,310 +1,900 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>DAB Exchange PRO</title>
+<!-- DAB Exchange PRO Section - Integrado debajo de Ecosystem -->
+<section class="section" id="exchange-section">
+  <h2 class="eco-title">DAB Exchange PRO</h2>
+  <p class="eco-subtitle">
+    Intercambia DBN por DAB y viceversa con tarifas transparentes y límites diarios de redención.
+  </p>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <div class="exchange-wrapper">
+    
+    <!-- Wallet Connection Card -->
+    <div class="exchange-card connect-card">
+      <button class="btn btn-primary exchange-connect-btn" onclick="connectExchangeWallet()">
+        <span>🔗 Conectar Wallet</span>
+      </button>
+      
+      <div id="exchange-wallet-info" class="wallet-info" style="display:none;">
+        <div class="wallet-row">
+          <span class="wallet-label">Wallet:</span>
+          <span id="exchange-wallet-address" class="wallet-address">-</span>
+        </div>
+        <div class="wallet-balances">
+          <div class="balance-item">
+            <span class="balance-label">DAB Balance</span>
+            <span id="exchange-dab-balance" class="balance-value">0</span>
+          </div>
+          <div class="balance-item">
+            <span class="balance-label">DBN Balance</span>
+            <span id="exchange-dbn-balance" class="balance-value">0</span>
+          </div>
+        </div>
+        <div class="price-info">
+          <div class="price-row">
+            <span>Precio</span>
+            <span id="exchange-price">1 DAB = 0 DBN</span>
+          </div>
+          <div class="limit-row">
+            <span>Límite Diario</span>
+            <span id="exchange-daily-limit">0 DBN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exchange Grid -->
+    <div class="exchange-grid">
+      
+      <!-- BUY CARD -->
+      <div class="exchange-card trade-card">
+        <div class="trade-header">
+          <div class="trade-icon buy-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12l7-7 7 7"/>
+            </svg>
+          </div>
+          <h3>Comprar DAB</h3>
+        </div>
+        
+        <div class="input-group">
+          <div class="input-header">
+            <label>Pagas (DBN)</label>
+            <span class="max-btn" onclick="setMaxExchangeBuy()">MAX</span>
+          </div>
+          <input type="number" id="exchange-buy-input" class="exchange-input" oninput="previewExchangeBuy()" placeholder="0.00" step="0.01">
+        </div>
+        
+        <div class="preview-box" id="exchange-buy-preview">
+          <div class="preview-row">
+            <span>Recibes:</span>
+            <span class="preview-value" id="exchange-buy-receive">- DAB</span>
+          </div>
+          <div class="preview-row fee">
+            <span>Fee (2%):</span>
+            <span class="preview-value" id="exchange-buy-fee">- DAB</span>
+          </div>
+          <div class="preview-row net">
+            <span>Neto:</span>
+            <span class="preview-value highlight" id="exchange-buy-net">- DAB</span>
+          </div>
+        </div>
+        
+        <button id="exchange-buy-btn" class="btn btn-buy" onclick="executeExchangeBuy()" disabled>
+          Comprar DAB
+        </button>
+      </div>
+
+      <!-- REDEEM CARD -->
+      <div class="exchange-card trade-card">
+        <div class="trade-header">
+          <div class="trade-icon redeem-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 19V5M5 12l7 7 7-7"/>
+            </svg>
+          </div>
+          <h3>Redimir DAB</h3>
+        </div>
+        
+        <div class="input-group">
+          <div class="input-header">
+            <label>Pagas (DAB)</label>
+            <span class="max-btn" onclick="setMaxExchangeRedeem()">MAX</span>
+          </div>
+          <input type="number" id="exchange-redeem-input" class="exchange-input" oninput="previewExchangeRedeem()" placeholder="0.00" step="0.01">
+        </div>
+        
+        <div class="preview-box" id="exchange-redeem-preview">
+          <div class="preview-row">
+            <span>Recibes:</span>
+            <span class="preview-value" id="exchange-redeem-receive">- DBN</span>
+          </div>
+          <div class="preview-row fee">
+            <span>Fee (3%):</span>
+            <span class="preview-value" id="exchange-redeem-fee">- DBN</span>
+          </div>
+          <div class="preview-row net">
+            <span>Neto:</span>
+            <span class="preview-value highlight" id="exchange-redeem-net">- DBN</span>
+          </div>
+        </div>
+        
+        <button id="exchange-redeem-btn" class="btn btn-redeem" onclick="executeExchangeRedeem()" disabled>
+          Redimir DAB
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Status Message -->
+    <div id="exchange-status" class="exchange-status"></div>
+    
+  </div>
+</section>
 
 <style>
-body{
-    margin:0;
-    background:#0f172a;
-    font-family:Arial;
-    color:white;
+/* DAB Exchange PRO - Adaptación visual fiel al index.html */
+
+#exchange-section {
+  padding: 80px 40px;
+  background: linear-gradient(180deg, rgba(12,17,27,0.6) 0%, rgba(9,15,23,0.9) 100%);
+  border-top: 1px solid rgba(0,224,255,0.08);
+  position: relative;
+  overflow: hidden;
 }
 
-.wrapper{
-    max-width:480px;
-    margin:40px auto;
-    background:#1e293b;
-    padding:25px;
-    border-radius:14px;
-    box-shadow:0 0 25px rgba(0,0,0,.5);
+#exchange-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,224,255,0.3), transparent);
 }
 
-h2{text-align:center;margin-bottom:20px;}
-
-.card{
-    background:#0f172a;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:15px;
+.exchange-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-input{
-    width:100%;
-    padding:12px;
-    border-radius:8px;
-    border:none;
-    margin-top:8px;
-    font-size:16px;
+/* Cards principales - Basados en .eco-card */
+.exchange-card {
+  background: linear-gradient(145deg, #162233, #1b2a3a);
+  border-radius: 18px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255,255,255,0.03);
+  transition: all 0.3s ease;
+  padding: 28px;
+  border: 1px solid rgba(0,224,255,0.05);
 }
 
-button{
-    width:100%;
-    padding:12px;
-    border-radius:8px;
-    border:none;
-    font-weight:bold;
-    cursor:pointer;
-    margin-top:10px;
+.exchange-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(0, 150, 255, 0.15),
+    inset 0 0 0 1px rgba(0,224,255,0.1);
 }
 
-.primary{background:#3b82f6;color:white;}
-.success{background:#16a34a;color:white;}
-.danger{background:#ef4444;color:white;}
-.disabled{background:#555;cursor:not-allowed;}
+/* Card de conexión */
+.connect-card {
+  text-align: center;
+  margin-bottom: 35px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-.info{font-size:14px;opacity:.85;margin-top:6px;}
+.exchange-connect-btn {
+  font-size: 16px;
+  padding: 16px 36px;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 25px rgba(0,198,255,0.4);
+  position: relative;
+  overflow: hidden;
+}
 
-.status{text-align:center;margin-top:15px;font-size:14px;}
-.small{font-size:13px;opacity:.7;}
-.flex{display:flex;justify-content:space-between;}
-.max{cursor:pointer;color:#3b82f6;font-size:13px;}
+.exchange-connect-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.exchange-connect-btn:hover::before {
+  left: 100%;
+}
+
+.exchange-connect-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(0,198,255,0.7);
+}
+
+/* Wallet Info */
+.wallet-info {
+  margin-top: 30px;
+  text-align: left;
+  animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wallet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.wallet-label {
+  color: #9fb3c8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.wallet-address {
+  color: #00e0ff;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  background: rgba(0,224,255,0.1);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,224,255,0.2);
+  word-break: break-all;
+}
+
+.wallet-balances {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.balance-item {
+  background: rgba(0,0,0,0.25);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.3s;
+}
+
+.balance-item:hover {
+  background: rgba(0,0,0,0.35);
+  border-color: rgba(0,224,255,0.2);
+}
+
+.balance-label {
+  display: block;
+  color: #9fb3c8;
+  font-size: 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.balance-value {
+  display: block;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0,224,255,0.3);
+}
+
+.price-info {
+  background: rgba(0,198,255,0.05);
+  border: 1px solid rgba(0,224,255,0.15);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-around;
+  font-size: 13px;
+  backdrop-filter: blur(10px);
+}
+
+.price-row, .limit-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.price-row span:first-child, .limit-row span:first-child {
+  color: #9fb3c8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.price-row span:last-child, .limit-row span:last-child {
+  color: #00e0ff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Grid de intercambio */
+.exchange-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  .exchange-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .wallet-balances {
+    grid-template-columns: 1fr;
+  }
+  
+  #exchange-section {
+    padding: 60px 20px;
+  }
+  
+  .exchange-card {
+    padding: 22px;
+  }
+}
+
+/* Tarjetas de trading */
+.trade-card {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.trade-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0.6;
+}
+
+.trade-card:nth-child(1)::before {
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+}
+
+.trade-card:nth-child(2)::before {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.trade-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 5px;
+}
+
+.trade-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.buy-icon {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  box-shadow: 0 0 20px rgba(34,197,94,0.4);
+}
+
+.redeem-icon {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  box-shadow: 0 0 20px rgba(239,68,68,0.4);
+}
+
+.trade-icon svg {
+  width: 22px;
+  height: 22px;
+  color: white;
+  stroke-width: 2.5;
+}
+
+.trade-card h3 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-header label {
+  color: #9fb3c8;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.max-btn {
+  color: #00e0ff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: rgba(0,224,255,0.1);
+  border: 1px solid rgba(0,224,255,0.2);
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.max-btn:hover {
+  background: rgba(0,224,255,0.25);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.exchange-input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.3);
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  box-sizing: border-box;
+  transition: all 0.3s;
+  font-family: 'Courier New', monospace;
+}
+
+.exchange-input:focus {
+  outline: none;
+  border-color: #00e0ff;
+  box-shadow: 0 0 20px rgba(0,224,255,0.25), inset 0 0 0 1px rgba(0,224,255,0.1);
+  background: rgba(0,0,0,0.4);
+}
+
+.exchange-input::placeholder {
+  color: #5c6d82;
+  font-weight: 400;
+}
+
+/* Preview Box */
+.preview-box {
+  background: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  align-items: center;
+}
+
+.preview-row span:first-child {
+  color: #9fb3c8;
+}
+
+.preview-value {
+  color: #ffffff;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.preview-row.fee .preview-value {
+  color: #fbbf24;
+  font-size: 13px;
+}
+
+.preview-row.net .preview-value {
+  color: #22c55e;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.preview-row.net .preview-value.highlight {
+  text-shadow: 0 0 10px rgba(34,197,94,0.4);
+}
+
+/* Botones de acción */
+.btn-buy, .btn-redeem {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-buy {
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+  color: white;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+}
+
+.btn-buy:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(34,197,94,0.6);
+}
+
+.btn-redeem {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+  color: white;
+  box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+}
+
+.btn-redeem:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(239,68,68,0.6);
+}
+
+.btn-buy:disabled, .btn-redeem:disabled {
+  background: #2d3748;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.5;
+  transform: none;
+}
+
+/* Status */
+.exchange-status {
+  margin-top: 30px;
+  text-align: center;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 20px;
+  transition: all 0.3s;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.exchange-status.success {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.3);
+  box-shadow: 0 0 20px rgba(34,197,94,0.2);
+}
+
+.exchange-status.error {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.3);
+  box-shadow: 0 0 20px rgba(239,68,68,0.2);
+}
+
+.exchange-status.loading {
+  background: rgba(0,224,255,0.1);
+  color: #00e0ff;
+  border: 1px solid rgba(0,224,255,0.3);
+  box-shadow: 0 0 20px rgba(0,224,255,0.2);
+}
+
+/* Animación de pulso para loading */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.exchange-status.loading::after {
+  content: "...";
+  animation: pulse-dot 1.5s infinite;
+}
 </style>
-</head>
-<body>
-
-<div class="wrapper">
-<h2>DAB Exchange</h2>
-
-<button class="primary" onclick="connectWallet()">Conectar Wallet</button>
-
-<div class="card">
-<div id="wallet">Wallet: -</div>
-<div id="balances"></div>
-<div id="priceInfo"></div>
-</div>
-
-<!-- BUY -->
-<div class="card">
-<div class="flex">
-<span>Comprar DAB</span>
-<span class="max" onclick="setMaxBuy()">MAX</span>
-</div>
-<input type="number" id="buyInput" oninput="previewBuy()" placeholder="Cantidad DBN">
-
-<div class="info" id="buyPreview"></div>
-<button id="buyBtn" class="success" onclick="executeBuy()">Comprar DAB</button>
-</div>
-
-<!-- REDEEM -->
-<div class="card">
-<div class="flex">
-<span>Redimir DAB</span>
-<span class="max" onclick="setMaxRedeem()">MAX</span>
-</div>
-<input type="number" id="redeemInput" oninput="previewRedeem()" placeholder="Cantidad DAB">
-
-<div class="info" id="redeemPreview"></div>
-<button id="redeemBtn" class="danger" onclick="executeRedeem()">Redimir DAB</button>
-</div>
-
-<div class="status" id="status"></div>
-
-</div>
 
 <script>
+// DAB Exchange PRO JavaScript - Integrado con funcionalidad completa
 
-// ========= CONFIG =========
-const DAB_ADDRESS = "0x9471052e67163Ac9eD01BAAe0894ec2f59313777";
-const DBN_ADDRESS = "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD";
-const REDEMPTION_ADDRESS = "0x379d02E48fF44cCDcb7Dea222aE823F5d0dEe18c";
+const EXCHANGE_CONFIG = {
+  DAB_ADDRESS: "0x9471052e67163Ac9eD01BAAe0894ec2f59313777",
+  DBN_ADDRESS: "0x2fD13338f4e9485fC33Be4DE53F4f6ff536811cD",
+  REDEMPTION_ADDRESS: "0x379d02E48fF44cCDcb7Dea222aE823F5d0dEe18c",
+  BUY_FEE: 0.02,
+  REDEEM_FEE: 0.03
+};
 
-const BUY_FEE = 0.02;
-const REDEEM_FEE = 0.03;
-// ==========================
+let exchangeProvider, exchangeSigner, exchangeUser;
+let exchangeDabContract, exchangeDbnContract, exchangeRedemptionContract;
+let exchangeDabBalance = 0;
+let exchangeDbnBalance = 0;
+let exchangePrice = 0;
+let exchangeDailyLimit = 0;
 
-let provider, signer, user;
-let dab, dbn, redemption;
-
-let dabBalance = 0;
-let dbnBalance = 0;
-let price = 0;
-let dailyLimit = 0;
-
-const ERC20_ABI = [
-"function approve(address spender,uint256 amount) external returns(bool)",
-"function balanceOf(address owner) view returns(uint256)",
-"function decimals() view returns(uint8)"
+const EXCHANGE_ERC20_ABI = [
+  "function approve(address spender,uint256 amount) external returns(bool)",
+  "function balanceOf(address owner) view returns(uint256)",
+  "function decimals() view returns(uint8)",
+  "function allowance(address owner, address spender) view returns(uint256)"
 ];
 
-const REDEMPTION_ABI = [
-"function buyDAB(uint256 dbnAmount) external",
-"function redeem(uint256 dabAmount) external",
-"function internalPrice() view returns(uint256)",
-"function redeemableDBNPerDay() view returns(uint256)"
+const EXCHANGE_REDEMPTION_ABI = [
+  "function buyDAB(uint256 dbnAmount) external",
+  "function redeem(uint256 dabAmount) external",
+  "function internalPrice() view returns(uint256)",
+  "function redeemableDBNPerDay() view returns(uint256)"
 ];
 
-// CONNECT
-async function connectWallet(){
+// Conectar wallet
+async function connectExchangeWallet() {
+  if (!window.ethereum) {
+    showExchangeStatus("Instala MetaMask para continuar", "error");
+    return;
+  }
 
-if(!window.ethereum){alert("Instala MetaMask");return;}
-if(!confirm("¿Conectar wallet?"))return;
+  try {
+    showExchangeStatus("Conectando wallet...", "loading");
+    
+    exchangeProvider = new ethers.providers.Web3Provider(window.ethereum);
+    await exchangeProvider.send("eth_requestAccounts", []);
+    exchangeSigner = exchangeProvider.getSigner();
+    exchangeUser = await exchangeSigner.getAddress();
 
-provider=new ethers.providers.Web3Provider(window.ethereum);
-await provider.send("eth_requestAccounts",[]);
-signer=provider.getSigner();
-user=await signer.getAddress();
+    // Inicializar contratos
+    exchangeDabContract = new ethers.Contract(EXCHANGE_CONFIG.DAB_ADDRESS, EXCHANGE_ERC20_ABI, exchangeProvider);
+    exchangeDbnContract = new ethers.Contract(EXCHANGE_CONFIG.DBN_ADDRESS, EXCHANGE_ERC20_ABI, exchangeProvider);
+    exchangeRedemptionContract = new ethers.Contract(EXCHANGE_CONFIG.REDEMPTION_ADDRESS, EXCHANGE_REDEMPTION_ABI, exchangeProvider);
 
-dab=new ethers.Contract(DAB_ADDRESS,ERC20_ABI,provider);
-dbn=new ethers.Contract(DBN_ADDRESS,ERC20_ABI,provider);
-redemption=new ethers.Contract(REDEMPTION_ADDRESS,REDEMPTION_ABI,provider);
-
-document.getElementById("wallet").innerText="Wallet: "+user;
-
-loadData();
+    // Actualizar UI
+    document.getElementById("exchange-wallet-address").innerText = 
+      exchangeUser.substring(0, 6) + "..." + exchangeUser.substring(38);
+    document.getElementById("exchange-wallet-info").style.display = "block";
+    
+    // Ocultar botón de conectar
+    document.querySelector(".exchange-connect-btn").style.display = "none";
+    
+    await loadExchangeData();
+    showExchangeStatus("Wallet conectada correctamente", "success");
+    
+    setTimeout(() => {
+      document.getElementById("exchange-status").innerText = "";
+      document.getElementById("exchange-status").className = "exchange-status";
+    }, 3000);
+    
+  } catch (error) {
+    console.error("Error conectando wallet:", error);
+    showExchangeStatus("Error al conectar wallet", "error");
+  }
 }
 
-// LOAD DATA
-async function loadData(){
+// Cargar datos
+async function loadExchangeData() {
+  try {
+    const [dabRaw, dbnRaw, dabDec, dbnDec, priceRaw, dailyRaw] = await Promise.all([
+      exchangeDabContract.balanceOf(exchangeUser),
+      exchangeDbnContract.balanceOf(exchangeUser),
+      exchangeDabContract.decimals(),
+      exchangeDbnContract.decimals(),
+      exchangeRedemptionContract.internalPrice(),
+      exchangeRedemptionContract.redeemableDBNPerDay()
+    ]);
 
-const dabRaw=await dab.balanceOf(user);
-const dbnRaw=await dbn.balanceOf(user);
-const dabDec=await dab.decimals();
-const dbnDec=await dbn.decimals();
+    exchangeDabBalance = parseFloat(ethers.utils.formatUnits(dabRaw, dabDec));
+    exchangeDbnBalance = parseFloat(ethers.utils.formatUnits(dbnRaw, dbnDec));
+    exchangePrice = parseFloat(ethers.utils.formatUnits(priceRaw, 18));
+    exchangeDailyLimit = parseFloat(ethers.utils.formatUnits(dailyRaw, dbnDec));
 
-dabBalance=parseFloat(ethers.utils.formatUnits(dabRaw,dabDec));
-dbnBalance=parseFloat(ethers.utils.formatUnits(dbnRaw,dbnDec));
+    document.getElementById("exchange-dab-balance").innerText = exchangeDabBalance.toFixed(4);
+    document.getElementById("exchange-dbn-balance").innerText = exchangeDbnBalance.toFixed(4);
+    document.getElementById("exchange-price").innerText = `1 DAB = ${exchangePrice.toFixed(4)} DBN`;
+    document.getElementById("exchange-daily-limit").innerText = exchangeDailyLimit.toFixed(2) + " DBN";
 
-const priceRaw=await redemption.internalPrice();
-price=parseFloat(ethers.utils.formatUnits(priceRaw,18));
-
-const dailyRaw=await redemption.redeemableDBNPerDay();
-dailyLimit=parseFloat(ethers.utils.formatUnits(dailyRaw,dbnDec));
-
-document.getElementById("balances").innerHTML=
-"Tienes "+dabBalance.toFixed(4)+" DAB<br>"+
-"Tienes "+dbnBalance.toFixed(4)+" DBN";
-
-document.getElementById("priceInfo").innerHTML=
-"Precio: 1 DAB = "+price.toFixed(4)+" DBN<br>"+
-"Límite diario DBN: "+dailyLimit.toFixed(4);
-
-previewBuy();
-previewRedeem();
+    previewExchangeBuy();
+    previewExchangeRedeem();
+  } catch (error) {
+    console.error("Error cargando datos:", error);
+  }
 }
 
-// MAX BUTTONS
-function setMaxBuy(){
-document.getElementById("buyInput").value=dbnBalance;
-previewBuy();
+// Set Max
+function setMaxExchangeBuy() {
+  document.getElementById("exchange-buy-input").value = exchangeDbnBalance.toFixed(4);
+  previewExchangeBuy();
 }
 
-function setMaxRedeem(){
-document.getElementById("redeemInput").value=dabBalance;
-previewRedeem();
+function setMaxExchangeRedeem() {
+  document.getElementById("exchange-redeem-input").value = exchangeDabBalance.toFixed(4);
+  previewExchangeRedeem();
 }
 
-// PREVIEW BUY
-function previewBuy(){
+// Preview Buy
+function previewExchangeBuy() {
+  const input = document.getElementById("exchange-buy-input");
+  const val = parseFloat(input.value);
+  const btn = document.getElementById("exchange-buy-btn");
+  
+  if (!val || val <= 0) {
+    document.getElementById("exchange-buy-receive").innerText = "- DAB";
+    document.getElementById("exchange-buy-fee").innerText = "- DAB";
+    document.getElementById("exchange-buy-net").innerText = "- DAB";
+    btn.disabled = true;
+    return;
+  }
 
-const val=parseFloat(document.getElementById("buyInput").value);
-if(!val||val<=0){document.getElementById("buyPreview").innerHTML="";return;}
+  if (val > exchangeDbnBalance) {
+    showExchangePreview("buy", "❌ Saldo insuficiente", true);
+    btn.disabled = true;
+    return;
+  }
 
-if(val>dbnBalance){
-document.getElementById("buyPreview").innerHTML="❌ No tienes suficiente DBN";
-disable("buyBtn");return;
+  const dabBruto = val / exchangePrice;
+  const fee = dabBruto * EXCHANGE_CONFIG.BUY_FEE;
+  const neto = dabBruto - fee;
+
+  document.getElementById("exchange-buy-receive").innerText = dabBruto.toFixed(4) + " DAB";
+  document.getElementById("exchange-buy-fee").innerText = fee.toFixed(4) + " DAB";
+  document.getElementById("exchange-buy-net").innerText = neto.toFixed(4) + " DAB";
+  btn.disabled = false;
 }
 
-const dabBruto=val/price;
-const fee=dabBruto*BUY_FEE;
-const neto=dabBruto-fee;
+// Preview Redeem
+function previewExchangeRedeem() {
+  const input = document.getElementById("exchange-redeem-input");
+  const val = parseFloat(input.value);
+  const btn = document.getElementById("exchange-redeem-btn");
+  
+  if (!val || val <= 0) {
+    document.getElementById("exchange-redeem-receive").innerText = "- DBN";
+    document.getElementById("exchange-redeem-fee").innerText = "- DBN";
+    document.getElementById("exchange-redeem-net").innerText = "- DBN";
+    btn.disabled = true;
+    return;
+  }
 
-document.getElementById("buyPreview").innerHTML=
-"Recibirás "+neto.toFixed(4)+" DAB<br>"+
-"Fee: "+fee.toFixed(4)+" DAB";
+  if (val > exchangeDabBalance) {
+    showExchangePreview("redeem", "❌ Saldo insuficiente", true);
+    btn.disabled = true;
+    return;
+  }
 
-enable("buyBtn");
+  const dbnBruto = val * exchangePrice;
+  const fee = dbnBruto * EXCHANGE_CONFIG.REDEEM_FEE;
+  const neto = dbnBruto - fee;
+
+  if (neto > exchangeDailyLimit) {
+    document.getElementById("exchange-redeem-receive").innerText = "⚠️ Excede límite";
+    document.getElementById("exchange-redeem-fee").innerText = "-";
+    document.getElementById("exchange-redeem-net").innerText = `Máx: ${exchangeDailyLimit.toFixed(2)} DBN`;
+    btn.disabled = true;
+    return;
+  }
+
+  document.getElementById("exchange-redeem-receive").innerText = dbnBruto.toFixed(4) + " DBN";
+  document.getElementById("exchange-redeem-fee").innerText = fee.toFixed(4) + " DBN";
+  document.getElementById("exchange-redeem-net").innerText = neto.toFixed(4) + " DBN";
+  btn.disabled = false;
 }
 
-// PREVIEW REDEEM
-function previewRedeem(){
-
-const val=parseFloat(document.getElementById("redeemInput").value);
-if(!val||val<=0){document.getElementById("redeemPreview").innerHTML="";return;}
-
-if(val>dabBalance){
-document.getElementById("redeemPreview").innerHTML="❌ No tienes suficiente DAB";
-disable("redeemBtn");return;
+function showExchangePreview(type, message, isError) {
+  document.getElementById(`exchange-${type}-receive`).innerText = message;
+  document.getElementById(`exchange-${type}-fee`).innerText = "-";
+  document.getElementById(`exchange-${type}-net`).innerText = "-";
 }
 
-const dbnBruto=val*price;
-const fee=dbnBruto*REDEEM_FEE;
-const neto=dbnBruto-fee;
+// Execute Buy
+async function executeExchangeBuy() {
+  const val = parseFloat(document.getElementById("exchange-buy-input").value);
+  if (!val || val <= 0) return;
 
-if(neto>dailyLimit){
-document.getElementById("redeemPreview").innerHTML=
-"⚠ Supera límite diario. Máximo hoy: "+dailyLimit.toFixed(4)+" DBN";
-disable("redeemBtn");return;
+  try {
+    showExchangeStatus("Aprobando DBN...", "loading");
+    
+    const dbnDec = await exchangeDbnContract.decimals();
+    const parsed = ethers.utils.parseUnits(val.toString(), dbnDec);
+    
+    const dbnWithSigner = exchangeDbnContract.connect(exchangeSigner);
+    const redemptionWithSigner = exchangeRedemptionContract.connect(exchangeSigner);
+
+    // Check allowance
+    const allowance = await exchangeDbnContract.allowance(exchangeUser, EXCHANGE_CONFIG.REDEMPTION_ADDRESS);
+    if (allowance.lt(parsed)) {
+      const txApprove = await dbnWithSigner.approve(EXCHANGE_CONFIG.REDEMPTION_ADDRESS, parsed);
+      await txApprove.wait();
+    }
+
+    showExchangeStatus("Comprando DAB...", "loading");
+    const txBuy = await redemptionWithSigner.buyDAB(parsed);
+    await txBuy.wait();
+
+    showExchangeStatus("¡Compra completada! ✓", "success");
+    document.getElementById("exchange-buy-input").value = "";
+    previewExchangeBuy();
+    await loadExchangeData();
+    
+  } catch (error) {
+    console.error("Error en compra:", error);
+    showExchangeStatus("Error en la transacción", "error");
+  }
 }
 
-document.getElementById("redeemPreview").innerHTML=
-"Recibirás "+neto.toFixed(4)+" DBN<br>"+
-"Fee: "+fee.toFixed(4)+" DBN";
+// Execute Redeem
+async function executeExchangeRedeem() {
+  const val = parseFloat(document.getElementById("exchange-redeem-input").value);
+  if (!val || val <= 0) return;
 
-enable("redeemBtn");
+  try {
+    showExchangeStatus("Aprobando DAB...", "loading");
+    
+    const dabDec = await exchangeDabContract.decimals();
+    const parsed = ethers.utils.parseUnits(val.toString(), dabDec);
+    
+    const dabWithSigner = exchangeDabContract.connect(exchangeSigner);
+    const redemptionWithSigner = exchangeRedemptionContract.connect(exchangeSigner);
+
+    // Check allowance
+    const allowance = await exchangeDabContract.allowance(exchangeUser, EXCHANGE_CONFIG.REDEMPTION_ADDRESS);
+    if (allowance.lt(parsed)) {
+      const txApprove = await dabWithSigner.approve(EXCHANGE_CONFIG.REDEMPTION_ADDRESS, parsed);
+      await txApprove.wait();
+    }
+
+    showExchangeStatus("Redimiendo DAB...", "loading");
+    const txRedeem = await redemptionWithSigner.redeem(parsed);
+    await txRedeem.wait();
+
+    showExchangeStatus("¡Redención completada! ✓", "success");
+    document.getElementById("exchange-redeem-input").value = "";
+    previewExchangeRedeem();
+    await loadExchangeData();
+    
+  } catch (error) {
+    console.error("Error en redención:", error);
+    showExchangeStatus("Error en la transacción", "error");
+  }
 }
 
-// EXECUTE BUY
-async function executeBuy(){
-
-const val=parseFloat(document.getElementById("buyInput").value);
-if(!val)return;
-
-document.getElementById("status").innerText="Esperando confirmación...";
-
-const dbnSigner=dbn.connect(signer);
-const redemptionSigner=redemption.connect(signer);
-
-const dbnDec=await dbn.decimals();
-const parsed=ethers.utils.parseUnits(val.toString(),dbnDec);
-
-const tx1=await dbnSigner.approve(REDEMPTION_ADDRESS,parsed);
-await tx1.wait();
-
-const tx2=await redemptionSigner.buyDAB(parsed);
-await tx2.wait();
-
-document.getElementById("status").innerText="Compra completada ✔";
-loadData();
+function showExchangeStatus(message, type) {
+  const status = document.getElementById("exchange-status");
+  status.innerText = message;
+  status.className = "exchange-status " + type;
 }
 
-// EXECUTE REDEEM
-async function executeRedeem(){
-
-const val=parseFloat(document.getElementById("redeemInput").value);
-if(!val)return;
-
-document.getElementById("status").innerText="Esperando confirmación...";
-
-const dabSigner=dab.connect(signer);
-const redemptionSigner=redemption.connect(signer);
-
-const dabDec=await dab.decimals();
-const parsed=ethers.utils.parseUnits(val.toString(),dabDec);
-
-const tx1=await dabSigner.approve(REDEMPTION_ADDRESS,parsed);
-await tx1.wait();
-
-const tx2=await redemptionSigner.redeem(parsed);
-await tx2.wait();
-
-document.getElementById("status").innerText="Redimido ✔";
-loadData();
-}
-
-function disable(id){
-document.getElementById(id).classList.add("disabled");
-document.getElementById(id).disabled=true;
-}
-
-function enable(id){
-document.getElementById(id).classList.remove("disabled");
-document.getElementById(id).disabled=false;
-}
-
+// Auto-refresh cada 30 segundos si está conectado
+setInterval(() => {
+  if (exchangeUser) {
+    loadExchangeData();
+  }
+}, 30000);
 </script>
-</body>
-</html>
